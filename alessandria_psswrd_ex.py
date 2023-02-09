@@ -46,7 +46,7 @@ def create_password_generator_v2(string: str):
                 for i in string:
                     alnum=i.isalnum()
                     if not alnum:
-                        notalnum.append(alnum)
+                        notalnum.append(i)
 
                 r1=random.randint(0,n)
                 list_password_charac[r1]=random.choice(notalnum)

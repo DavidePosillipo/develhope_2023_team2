@@ -13,7 +13,6 @@ class DataPreprocessor:
         self.to_datetime(df, 'Last Updated')
         self.sort_values(df)
         self.drop_duplicates(df)
-        self.to_int32(df, 'Reviews')
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
 
@@ -32,9 +31,6 @@ class DataPreprocessor:
                 'Android Ver'], # Ignoring 'Reviews', 'Category', and 'Last Updated'
             keep = keep, # The last entry is also the most recent one 
             inplace = inplace)
-
-    def to_int32(self, df, column):
-        df[column] = df[column].astype('Int32')
 
     def item_to_bytes(self, item):
         if item.isdigit():

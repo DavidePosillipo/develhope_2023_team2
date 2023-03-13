@@ -76,5 +76,5 @@ class DataPreprocessor:
         df['Rating'].fillna(mean, inplace=True)
         
     def reviews_to_int(self, df):
-        df['Reviews'].astype('Int32')
+        df['Reviews'] = df['Reviews'].astype('Int32')
     

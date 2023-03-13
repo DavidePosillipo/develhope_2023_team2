@@ -15,6 +15,7 @@ class DataPreprocessor:
         self.drop_duplicates(df)
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
+        self.size_to_int(df)
         self.rating_fillna(df)
         self.reviews_to_int(df)
 
@@ -56,6 +57,9 @@ class DataPreprocessor:
 
         for category in df['Category'].unique():
             df.loc[(df['Category'] == category) & (df['Size'] == 'Varies with device'), 'Size'] = categories_mean_size[category]
+
+    def size_to_int(self, df):
+        df['Size'] = df['Size'].astype('Int32')
 
     def installs_cleaning(self, df):
         for i in range(len(df)):

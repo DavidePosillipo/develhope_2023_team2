@@ -15,4 +15,4 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
-print(df)
+print(df.info())

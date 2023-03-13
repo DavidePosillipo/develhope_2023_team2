@@ -11,7 +11,7 @@ class DataPreprocessor:
     def pipeline(self, df):
         df = df.copy()
         self.to_datetime(df, 'Last Updated')
-        self.sort_values(df)
+        self.sort_values(df, by=['Last Updated'])
         self.drop_duplicates(df)
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
@@ -24,7 +24,7 @@ class DataPreprocessor:
     def to_datetime(self, df, column):
         df[column] = pd.to_datetime(df[column])
         
-    def sort_values(self, df, by: str|list =['Last Updated']):
+    def sort_values(self, df, by: str|list):
         df.sort_values(by=by, inplace=True)
 
     def drop_duplicates(self, df, keep: Literal['first', 'last', False]='last', inplace: bool=True):

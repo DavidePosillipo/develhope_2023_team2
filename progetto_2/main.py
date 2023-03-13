@@ -15,4 +15,7 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
-print(df.info())
+
+print(df)
+print(df.dtypes)
+print(df.isna().sum())

@@ -15,7 +15,9 @@ class DataPreprocessor:
         self.drop_duplicates(df)
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
-        self.installs_cleaning(df)
+        self.rating_fillna(df)
+        self.reviews_to_int(df)
+
         return df
 
     def to_datetime(self, df, column):
@@ -31,7 +33,6 @@ class DataPreprocessor:
                 'Android Ver'], # Ignoring 'Reviews', 'Category', and 'Last Updated'
             keep = keep, # The last entry is also the most recent one 
             inplace = inplace)
-        df.sort_index(inplace= True, ignore_index= True)
 
     def item_to_bytes(self, item):
         if item.isdigit():
@@ -69,24 +70,11 @@ class DataPreprocessor:
 
         return df
      
-
-    def rating_fillna (self, df):
+    def rating_fillna(self, df):
         ## replacing nan values with mean of the column 
-        s=sum(df['Rating'].dropna())
-        n=df['Rating'].shape[0]
-        rating_mean=s/n
-        print(rating_mean)
-        df['Rating'].fillna(rating_mean, inplace=True)
+        mean = df['Rating'].dropna().mean()
+        df['Rating'].fillna(mean, inplace=True)
         
-    def reviews_to_int():
-        n=0
-        except_ls=[]
-        for i in data['Reviews']:
-            try:
-                int_value=int(i)
-                data['Reviews'].values[n]=int_value
-            except:
-                except_ls.append([n,i])
-            n+=1
-        
+    def reviews_to_int(self, df):
+        df['Reviews'].astype('Int32')
     

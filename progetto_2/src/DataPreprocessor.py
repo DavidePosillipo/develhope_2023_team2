@@ -80,5 +80,9 @@ class DataPreprocessor:
         df['Rating'].fillna(mean, inplace=True)
         
     def reviews_to_int(self, df):
-        df['Reviews'] = df['Reviews'].astype('Int32')
+        n=0
+        for i in df['Reviews']:
+            df['Reviews'][n]=int(i)
+            n+=1
+        df.astype({'Reviews':'Int64'}, copy=False)
     

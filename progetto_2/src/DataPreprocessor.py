@@ -16,6 +16,7 @@ class DataPreprocessor:
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
         self.size_to_int(df)
+        self.installs_cleaning(df)
         self.rating_fillna(df)
         self.reviews_to_int(df)
         self.drop_na_values(df)
@@ -63,17 +64,10 @@ class DataPreprocessor:
         df['Size'] = df['Size'].astype('Int32')
 
     def installs_cleaning(self, df):
-        for i in range(len(df)):
-            if df.Installs[i] == "0+":
-                df.Installs[i] = "1"
-            if "," in df.Installs[i]:
-                df.Installs[i] = "".join(list(x for x in df.Installs[i][:len(df.Installs[i]) -1] if x != ","))
-            if "+" in df.Installs[i]:
-                df.Installs[i] = df.Installs[i][:len(df.Installs[i]) -1]
-
-        df.Installs = df.Installs.astype(int)
-
+    
+        df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)
         return df
+        
      
     def rating_fillna(self, df):
         ## replacing nan values with mean of the column 

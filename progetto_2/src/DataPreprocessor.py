@@ -18,6 +18,7 @@ class DataPreprocessor:
         self.size_to_int(df)
         self.rating_fillna(df)
         self.reviews_to_int(df)
+        self.drop_na_values(df)
 
         return df
 
@@ -80,9 +81,9 @@ class DataPreprocessor:
         df['Rating'].fillna(mean, inplace=True)
         
     def reviews_to_int(self, df):
-        n=0
-        for i in df['Reviews']:
-            df['Reviews'][n]=int(i)
-            n+=1
-        df.astype({'Reviews':'Int64'}, copy=False)
+        df['Reviews'] = df['Reviews'].astype('Int32')
+
+    def drop_na_values(self, df):
+        if df.isna().sum().any()>0:
+            df.dropna(inplace=True)
     

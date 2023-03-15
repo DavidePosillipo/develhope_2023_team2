@@ -1,5 +1,6 @@
 import math
 from typing import Literal
+import numpy as np
 
 import pandas as pd
 
@@ -17,6 +18,7 @@ class DataPreprocessor:
         self.estimate_size(df)
         self.size_to_int(df)
         self.installs_cleaning(df)
+        self.price(df)
         self.rating_fillna(df)
         self.reviews_to_int(df)
         self.drop_na_values(df)
@@ -68,7 +70,11 @@ class DataPreprocessor:
         df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)
         return df
         
-     
+    def price(self, df):
+    
+        df['Price'] = np.array([value.replace('$', '') for value in df['Price']]).astype(float)
+        return df['Price']
+        
     def rating_fillna(self, df):
         ## replacing nan values with mean of the column 
         mean = df['Rating'].dropna().mean()
@@ -80,4 +86,3 @@ class DataPreprocessor:
     def drop_na_values(self, df):
         if df.isna().sum().any()>0:
             df.dropna(inplace=True)
-    

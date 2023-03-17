@@ -93,7 +93,16 @@ class DataPreprocessor:
         
     def reviews_to_int(self, df):
         # Casting reviews column in integer type 
-        df.astype({'Reviews':'Int64'}, copy=False).dtypes
+        n=0
+        except_ls=[]
+        for i in df['Reviews']:
+            try:
+                int_value=int(i)
+                df['Reviews'].values[n]=int_value
+            except:
+                except_ls.append([n,i])
+            n+=1
+        df['Reviews']=df['Reviews'].astype({'Reviews':'Int32'}, copy=False)
         
     def drop_na_values(self, df):
         # Dropping Nan value(s) left

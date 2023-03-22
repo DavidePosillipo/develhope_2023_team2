@@ -3,6 +3,7 @@ import numpy as np
 
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
+from src.DataVisualizator import DataVisualizzator
 
 di = DataIngestor()
 
@@ -15,7 +16,10 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
-
 print(df)
 print(df.dtypes)
 print(df.isna().sum())
+
+dv = DataVisualizzator()
+
+dv.installs_by_category(df)

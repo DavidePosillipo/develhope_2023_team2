@@ -12,9 +12,9 @@ class DataVisualizzator:
     def installs_by_category(self, df):
         # Displays a barplot for the total installs by category. Sorted by total installs.
 
-        # Create a pandas DataFrame with svery category paired with the total installs
-        data = df[['Category','Installs']].groupby(by='Category').agg('sum').reset_index()
-        data = data.sort_values('Installs')
+        
+        data = df[['Category','Installs']].groupby(by='Category').agg('sum').reset_index() # Create a pandas DataFrame with every category paired with the total amount of installs
+        
 
 
         fig, ax = plt.subplots(figsize=(17, 5))
@@ -26,6 +26,7 @@ class DataVisualizzator:
                         order=data.sort_values(by='Installs', ascending=False).Category,
                         color="b")
         else:
+            data = data.sort_values('Installs')
             ax.barh(y=data.Category, width=data.Installs)
 
         ax.set(title = "Installs by category",

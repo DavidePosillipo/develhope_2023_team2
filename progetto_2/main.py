@@ -20,6 +20,10 @@ print(df)
 print(df.dtypes)
 print(df.isna().sum())
 
-dv = DataVisualizzator()
+sns_vis = DataVisualizzator(seaborn_theme="darkgrid")
 
-dv.installs_by_category(df)
+sns_vis.installs_by_category(df)
+
+plt_vis = DataVisualizzator(library="matplotlib")
+
+plt_vis.installs_by_category(df)

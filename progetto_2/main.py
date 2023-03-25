@@ -20,10 +20,10 @@ print(df)
 print(df.dtypes)
 print(df.isna().sum())
 
-sns_vis = DataVisualizator(seaborn_theme="darkgrid")
+sns_vis = DataVisualizator(library="seaborn")
 
-sns_vis.column_by_grouping(df, column="Rating", group_by="Type")
+sns_vis.column_by_grouping(df, column="Rating", group_by="Type", function='mean')
 
 plt_vis = DataVisualizator(library="matplotlib")
 
-plt_vis.column_by_grouping(df, column="Rating", group_by="Type")
+plt_vis.column_by_grouping(df, column="Rating", group_by="Type", function='mean')

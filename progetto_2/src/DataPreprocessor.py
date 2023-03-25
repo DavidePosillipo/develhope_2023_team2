@@ -89,7 +89,7 @@ class DataPreprocessor:
         
     def rating_fillna(self, df):
         ## replacing nan values with mean of the column 
-        mean = df['Rating'].dropna().mean()
+        mean = round(df['Rating'].dropna().mean(), 1)
         df['Rating'].fillna(mean, inplace=True)
         
     def reviews_to_int(self, df):

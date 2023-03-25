@@ -3,7 +3,7 @@ import numpy as np
 
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
-from src.DataVisualizator import DataVisualizator
+from src.DataVisualizer import DataVisualizer
 
 di = DataIngestor()
 
@@ -16,14 +16,16 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
+df= di.load_file('processed_googleplaystore.csv')
+
 print(df)
 print(df.dtypes)
 print(df.isna().sum())
 
-sns_vis = DataVisualizator(library="seaborn")
+sns_vis = DataVisualizer(library="seaborn")
 
-sns_vis.column_by_grouping(df, column="Rating", group_by="Type", function='mean')
+sns_vis.column_by_grouping(df, column="Rating", group_by="Category", function='sum')
 
-plt_vis = DataVisualizator(library="matplotlib")
+plt_vis = DataVisualizer(library="matplotlib")
 
-plt_vis.column_by_grouping(df, column="Rating", group_by="Type", function='mean')
+plt_vis.column_by_grouping(df, column="Rating", group_by="Category", function='sum')

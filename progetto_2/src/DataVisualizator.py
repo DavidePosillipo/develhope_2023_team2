@@ -23,7 +23,6 @@ class DataVisualizator:
                         x=column,
                         color="b")
             plt.title(f'{column} by {group_by}')
-            plt.show()
 
         else:
             ax.barh(y=data[group_by], width=data[column])

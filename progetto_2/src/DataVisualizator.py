@@ -11,8 +11,8 @@ class DataVisualizator:
 
     def column_by_grouping(self, df, column, group_by, function):
 
-        
-        data = df[[group_by, column]].groupby(by=group_by).agg(function).reset_index() # Create a pandas DataFrame with every category paired with the total amount of installs
+        # Create a pandas DataFrame with the requested data to be plotted
+        data = df[[group_by, column]].groupby(by=group_by).agg(function).reset_index().sort_values(by=column, ascending=False) 
         
 
         fig, ax = plt.subplots(figsize=(17, 5))
@@ -21,12 +21,12 @@ class DataVisualizator:
             sns.barplot(data=data,
                         y=group_by,
                         x=column,
-                        order=data.sort_values(by=column, ascending=False),
                         color="b")
-        else:
-            data = data.sort_values(column)
-            ax.barh(y=data[group_by], width=data[column])
+            plt.title(f'{column} by {group_by}')
+            plt.show()
 
+        else:
+            ax.barh(y=data[group_by], width=data[column])
         ax.set(title = f'{column} by {group_by}',
                 xlim=  0,
                 xlabel = column,

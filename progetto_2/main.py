@@ -3,7 +3,7 @@ import numpy as np
 
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
-from src.DataVisualizator import DataVisualizzator
+from src.DataVisualizator import DataVisualizator
 
 di = DataIngestor()
 
@@ -20,10 +20,10 @@ print(df)
 print(df.dtypes)
 print(df.isna().sum())
 
-sns_vis = DataVisualizzator(seaborn_theme="darkgrid")
+sns_vis = DataVisualizator(seaborn_theme="darkgrid")
 
-sns_vis.installs_by_category(df)
+sns_vis.column_by_grouping(df, column="Rating", group_by="Type")
 
-plt_vis = DataVisualizzator(library="matplotlib")
+plt_vis = DataVisualizator(library="matplotlib")
 
-plt_vis.installs_by_category(df)
+plt_vis.column_by_grouping(df, column="Rating", group_by="Type")

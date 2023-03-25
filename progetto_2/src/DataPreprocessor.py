@@ -25,6 +25,7 @@ class DataPreprocessor:
         self.reviews_to_int(df)
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
+        self.save_to_csv(df)
 
         return df
 
@@ -99,3 +100,7 @@ class DataPreprocessor:
         # Dropping Nan value(s) left
         if df.isna().sum().any()>0:
             df.dropna(inplace=True)
+
+    def save_to_csv(self, df):
+
+        df.to_csv('processed_googleplaystore.csv') 

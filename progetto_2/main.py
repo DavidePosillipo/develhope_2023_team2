@@ -23,9 +23,9 @@ print(df.dtypes)
 print(df.isna().sum())
 
 sns_vis = DataVisualizer(library="seaborn")
-
 sns_vis.column_by_grouping(df, column="Rating", group_by="Category", function='sum')
+sns_vis.scatter_plot(df, 'Installs', 'Reviews')
 
 plt_vis = DataVisualizer(library="matplotlib")
-
 plt_vis.column_by_grouping(df, column="Rating", group_by="Category", function='sum')
+plt_vis.scatter_plot(df, 'Installs', 'Reviews')

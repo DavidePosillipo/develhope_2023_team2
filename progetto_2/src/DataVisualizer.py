@@ -1,6 +1,9 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
 
 class DataVisualizer:
 
@@ -9,10 +12,11 @@ class DataVisualizer:
         if seaborn_theme:
             sns.set_theme(style=seaborn_theme)
 
+
     def column_by_grouping(self, df, column, group_by, function):
         data = df[[group_by, column]].groupby(by=group_by).agg(function).reset_index()
         
-        fig, ax = plt.subplots(figsize=(15, 5))
+        fig, ax = plt.subplots(figsize=(15, 6))
 
         if self.library == "seaborn":
 
@@ -32,3 +36,54 @@ class DataVisualizer:
                 ylabel= group_by)
         plt.show()
 
+
+    def scatter_plot(self, df, col1, col2): #Impostare booleano per allungare query e fare group_by
+        def rho(col1, col2):
+            r = np.corrcoef(col1, col2)
+            return r[0,1]
+        
+        x = df[col1]
+        y = df[col2]
+
+
+        if self.library == "seaborn":
+            sns.regplot(x=x, y=y, data=df)
+
+        else :
+            plt.plot(x, y, 'o', color='blue')
+            m, b = np.polyfit(x, y, 1)
+            plt.plot(x, m*x+b, color='blue')
+        
+        plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
+        plt.xlabel(f'Number of {col1}')
+        plt.ylabel(f'Total {col2}')
+        plt.show()
+
+    def cluster_scatter(slef, df, col1, col2, group_by):
+        nun_df = df.select_dtypes(include='number')#try exclude
+
+        def z_score(nun_df):
+            return (nun_df-nun_df.mean())/nun_df.std()
+
+        std_df = nun_df.transform(z_score, axis=0)
+        std_df = std_df[['Rating', 'Reviews', 'Size', 'Installs', 'Price']]
+        subset = df[['App', 'Category', 'Type', 'Content Rating']]
+        new_df = pd.concat([subset, std_df], axis=1)
+        new_df
+
+        unique_categories = df['Category'].unique()
+        label_dict = {}
+        for i, category in enumerate(unique_categories):
+            label_dict[category] = i
+
+        kmeans = KMeans(n_clusters=len(df[group_by].unique()), random_state=0).fit(std_df)
+        new_df[col1] = kmeans.labels_
+        new_df[col2] = [label_dict.get(i) for i in new_df[col1]]
+        new_df
+        
+
+
+# obiettivi:
+#if len(df['group_by'])<=8 bar.plot(verticale quindi x e y invertite)
+#scatterplot e regplot
+# Ma se usassimo l' ereditarietà per creare 2 sotto classi di data_visualizer, una per seaborn e una per matplotlib

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
-from sklearn.cluster import KMeans
+#from sklearn.cluster import KMeans
 
 class DataVisualizer:
 
@@ -13,8 +13,8 @@ class DataVisualizer:
             sns.set_theme(style=seaborn_theme)
 
 
-    def column_by_grouping(self, df, column, group_by, function):
-        data = df[[group_by, column]].groupby(by=group_by).agg(function).reset_index()
+    def barh_by_grouping(self, df, column, group_by, agg):
+        data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
         
         fig, ax = plt.subplots(figsize=(15, 6))
 
@@ -26,8 +26,8 @@ class DataVisualizer:
                         color="b")
             plt.title(f'{column} by {group_by}')
 
-        else :
-            data = df[[group_by, column]].groupby(by=group_by).agg(function).reset_index().sort_values(by=column, ascending=True) # FYI Purtroppo seaborn e matplotlib ordinano i valori in maniera opposta
+        else:
+            data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index().sort_values(by=column, ascending=True) # FYI Purtroppo seaborn e matplotlib ordinano i valori in maniera opposta
 
             ax.barh(y=group_by, width=column, data=data)
             
@@ -36,6 +36,45 @@ class DataVisualizer:
                 ylabel= group_by)
         plt.show()
 
+
+    def countplot(self, df, var:str, hue:str=None):
+        # Automatically create a countplot of the specified categorical variable.
+        # Optionally a hue can be specified to split the each entry into multiple bars.
+        # No need to specify x or y, they are automatically assigned.
+
+        fig, ax = plt.subplots()
+
+        if len(df[var].unique()) < 5:
+            if not hue:
+                if self.library == 'seaborn':
+                    sns.countplot(x=data.items, color='blue', order=df[var].value_counts().index)
+                else:
+                    data = df['Category'].value_counts().sort_values(ascending=True)
+                    plt.bar(x=data.index, height=data.values, color='blue')
+            else:
+                if self.library == 'seaborn':
+                    sns.countplot(x=df[var], hue=df[hue], order=df[var].value_counts().index)
+                else:
+                    data = df.groupby(by=[var, hue]).size().reset_index()
+                    
+        else:
+            if not hue:
+                if self.library == 'seaborn':
+                    sns.countplot(y=df[var], color='blue', order=df[var].value_counts().index)
+                else:
+                    data = df['Category'].value_counts(ascending=True)
+                    plt.barh(y=data.index, width=data.values,color='blue')
+            else:
+                if self.library == 'seaborn':
+                    sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
+                else:
+                    data = df.groupby(by=[var, hue])[var, hue].size().reset_index(name='Count')
+                    print(data)
+                    
+
+        ax.set(title=f'Number of rows with for each {var} value')
+        plt.show()
+        
 
     def scatter_plot(self, df, col1, col2): #Impostare booleano per allungare query e fare group_by
         def rho(col1, col2):
@@ -49,7 +88,7 @@ class DataVisualizer:
         if self.library == "seaborn":
             sns.regplot(x=x, y=y, data=df)
 
-        else :
+        else:
             plt.plot(x, y, 'o', color='blue')
             m, b = np.polyfit(x, y, 1)
             plt.plot(x, m*x+b, color='blue')

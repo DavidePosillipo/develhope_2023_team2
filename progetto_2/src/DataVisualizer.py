@@ -133,10 +133,10 @@ class DataVisualizer:
         std_df = std_df[['Rating', 'Reviews', 'Size', 'Installs', 'Price']]
         subset = df[['App', 'Type', 'Content Rating']]
         subset_1 = df[['Category']]
-        frames = [subset_1, subset, nun_df, std_df]
         data = pd.merge(subset_1, subset, left_index=True, right_index=True)
         data1 = pd.merge(nun_df, std_df, left_index=True, right_index=True, suffixes=('', '_std'))
         final_data = pd.merge(data, data1, left_index=True, right_index=True)
+        
 
 
         unique_categories = final_data[hue].unique()
@@ -150,4 +150,4 @@ class DataVisualizer:
 
         sns.scatterplot(x=col1, y=col2, data=final_data, hue=hue)
         plt.show()
-        print(final_data)
+        return final_data

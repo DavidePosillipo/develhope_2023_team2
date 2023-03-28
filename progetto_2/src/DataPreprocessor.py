@@ -26,6 +26,7 @@ class DataPreprocessor:
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
         self.transform_age(df, 'Content Rating')
+        #self.drop_unnamed(df)
         self.save_to_csv(df)
 
         return df
@@ -109,11 +110,15 @@ class DataPreprocessor:
             "Everyone 10+": 10,
             "Teen": 13,
             "Mature 17+": 17,
-            "Adults only 18+": 18
+            "Adults only 18+": 18, 
+            "Unrated" : 0
         }
         df['Age Restriction'] = df[column].map(age_map).fillna(0).astype(int)
-       
-
+        df.loc[df['Content Rating'] == 'Unrated', 'Content Rating'] = 'Everyone'
+    
+    def drop_unnamed(self, df):
+        df = df.drop(columns=['Unnamed: 0'])
+    
     def save_to_csv(self, df):
 
-        df.to_csv('processed_googleplaystore.csv') 
+        df.to_csv('processed_googleplaystore.csv')

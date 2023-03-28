@@ -122,7 +122,7 @@ class DataVisualizer:
         plt.ylabel(f'Total {col2}')
         plt.show()
 
-    def cluster_scatter(self, df, col1, col2, group_by):
+    def cluster_scatter(self, df, col1, col2, hue):
         nun_df = df.select_dtypes(exclude='object')
         nun_df = nun_df.drop(columns=['Unnamed: 0'])
 
@@ -139,15 +139,15 @@ class DataVisualizer:
         final_data = pd.merge(data, data1, left_index=True, right_index=True)
 
 
-        unique_categories = final_data[group_by].unique()
+        unique_categories = final_data[hue].unique()
         label_dict = {}
         for i, category in enumerate(unique_categories):
             label_dict[category] = i
 
-        '''kmeans = KMeans(n_clusters=len(df[group_by].unique()), random_state=0)
+        '''kmeans = KMeans(n_clusters=len(df[hue].unique()), random_state=0)
         final_data[col1] = kmeans.labels_
         final_data[col2] = [label_dict.get(i) for i in final_data[col1]]'''
 
-        sns.scatterplot(x=col1, y=col2, data=final_data, hue=group_by)
+        sns.scatterplot(x=col1, y=col2, data=final_data, hue=hue)
         plt.show()
         print(final_data)

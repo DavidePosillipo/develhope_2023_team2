@@ -18,17 +18,24 @@ df = dp.pipeline(df)
 
 df= di.load_file('processed_googleplaystore.csv')
 
-print(df)
-print(df.dtypes)
-print(df.isna().sum())
-
 sns_vis = DataVisualizer(library="seaborn")
-sns_vis.cluster_scatter(df, 'Rating', 'Reviews', 'Content Rating')
-sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-sns_vis.scatter_plot(df, 'Installs', 'Reviews')
-sns_vis.countplot(df, var='Category', hue='Type')
-
 plt_vis = DataVisualizer(library="matplotlib")
-plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-plt_vis.scatter_plot(df, 'Installs', 'Reviews')
-plt_vis.countplot(df, var='Category', hue='Type')
+
+# 1-Find if there is a correlation between the price of the apps and the category (Teen, Everyone, Mature). 
+sns_vis.scatter_plot(df, 'Price', '')
+
+
+
+
+
+
+
+
+
+
+
+#2-find the sentiment of all apps using np files (negative words and positive words) and "afinn" lib 
+#link for np files https://drive.google.com/drive/folders/1824UvFm8WBcOX_iiev0kNMrDu7aUARra?usp=share_link
+#ask them to search about afinn lib 
+#3-for paid apps only list the top 5 highest and lowest sentiment numbers with the name of the app and the app category 
+#4-what is the best category according to sentiment values

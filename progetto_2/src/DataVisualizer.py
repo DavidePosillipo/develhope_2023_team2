@@ -55,7 +55,19 @@ class DataVisualizer:
                 if self.library == 'seaborn':
                     sns.countplot(x=df[var], hue=df[hue], order=df[var].value_counts().index)
                 else:
-                    data = df.groupby(by=[var, hue]).size().reset_index()
+                    data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
+                    data = data.sort_values(by=list(data.columns)[0], ascending=False)
+
+                    x = np.arange(len(data.index))
+                    width = 0.50 # Width of bars
+                    multiplier = 0
+                    for attribute, measurment in data.items():
+                        offset = width * multiplier
+                        bar = ax.bar(x + offset, measurment, width, label=attribute)
+                        ax.bar_label(bar, padding=3)
+                        multiplier += 1
+
+                    ax.set_xticks(x + width, data.index)
                     
         else:
             if not hue:
@@ -68,11 +80,23 @@ class DataVisualizer:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
                 else:
-                    data = df.groupby(by=[var, hue])[var, hue].size().reset_index(name='Count')
-                    print(data)
+                    data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
+                    data = data.sort_values(by=list(data.columns)[0])
+
+                    y = np.arange(len(data.index))
+                    height = 0.50 # height of bars
+                    multiplier = 0
+                    for attribute, measurment in data.items():
+                        offset = height * multiplier
+                        bar = ax.barh(y + offset, measurment, height, label=attribute)
+                        ax.bar_label(bar, padding=3)
+                        multiplier += 1
+
+                    ax.set_yticks(y + height, data.index)
+
                     
 
-        ax.set(title=f'Number of rows with for each {var} value')
+        ax.set(title=f'Number of apps with for each {var} value')
         plt.show()
         
 

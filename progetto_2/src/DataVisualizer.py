@@ -124,24 +124,30 @@ class DataVisualizer:
 
     def cluster_scatter(self, df, col1, col2, group_by):
         nun_df = df.select_dtypes(exclude='object')
+        nun_df = nun_df.drop(columns=['Unnamed: 0'])
 
         def z_score(nun_df):
             return (nun_df-nun_df.mean())/nun_df.std()
 
-        std_df = nun_df.transform(z_score, axis=0)
+        std_df = nun_df.agg(z_score, axis=0)
         std_df = std_df[['Rating', 'Reviews', 'Size', 'Installs', 'Price']]
-        subset = df[['App', 'Category', 'Type', 'Content Rating']]
-        new_df = pd.concat([subset, std_df], axis=1)
+        subset = df[['App', 'Type', 'Content Rating']]
+        subset_1 = df[['Category']]
+        frames = [subset_1, subset, nun_df, std_df]
+        data = pd.merge(subset_1, subset, left_index=True, right_index=True)
+        data1 = pd.merge(nun_df, std_df, left_index=True, right_index=True, suffixes=('', '_std'))
+        final_data = pd.merge(data, data1, left_index=True, right_index=True)
 
-        unique_categories = df[group_by].unique()
+
+        unique_categories = final_data[group_by].unique()
         label_dict = {}
         for i, category in enumerate(unique_categories):
             label_dict[category] = i
 
-        kmeans = KMeans(n_clusters=len(df[group_by].unique()), random_state=0).fit(std_df)
-        new_df[col1] = kmeans.labels_
-        new_df[col2] = [label_dict.get(i) for i in new_df[col1]]
+        '''kmeans = KMeans(n_clusters=len(df[group_by].unique()), random_state=0)
+        final_data[col1] = kmeans.labels_
+        final_data[col2] = [label_dict.get(i) for i in final_data[col1]]'''
 
-        sns.scatterplot(x=col1, y=col2, data=new_df, hue=group_by)
+        sns.scatterplot(x=col1, y=col2, data=final_data, hue=group_by)
         plt.show()
-        print(new_df)
+        print(final_data)

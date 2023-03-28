@@ -23,6 +23,8 @@ print(df.dtypes)
 print(df.isna().sum())
 
 sns_vis = DataVisualizer(library="seaborn")
+sns_vis.cluster_scatter(df, 'Rating', 'Category', 'Type')
+
 sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
 sns_vis.scatter_plot(df, 'Installs', 'Reviews')
 sns_vis.countplot(df, var='Category', hue='Type')
@@ -31,3 +33,4 @@ plt_vis = DataVisualizer(library="matplotlib")
 plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
 plt_vis.scatter_plot(df, 'Installs', 'Reviews')
 plt_vis.countplot(df, var='Category', hue='Type')
+

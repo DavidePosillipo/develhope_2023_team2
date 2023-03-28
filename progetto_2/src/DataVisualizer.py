@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
-#from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans
 
 class DataVisualizer:
 
@@ -100,7 +100,7 @@ class DataVisualizer:
         plt.show()
         
 
-    def scatter_plot(self, df, col1, col2): #Impostare booleano per allungare query e fare group_by
+    def scatter_plot(self, df, col1, col2): 
         def rho(col1, col2):
             r = np.corrcoef(col1, col2)
             return r[0,1]
@@ -122,8 +122,8 @@ class DataVisualizer:
         plt.ylabel(f'Total {col2}')
         plt.show()
 
-    def cluster_scatter(slef, df, col1, col2, group_by):
-        nun_df = df.select_dtypes(include='number')#try exclude
+    def cluster_scatter(self, df, col1, col2, group_by):
+        nun_df = df.select_dtypes(exclude='object')
 
         def z_score(nun_df):
             return (nun_df-nun_df.mean())/nun_df.std()
@@ -132,9 +132,8 @@ class DataVisualizer:
         std_df = std_df[['Rating', 'Reviews', 'Size', 'Installs', 'Price']]
         subset = df[['App', 'Category', 'Type', 'Content Rating']]
         new_df = pd.concat([subset, std_df], axis=1)
-        new_df
 
-        unique_categories = df['Category'].unique()
+        unique_categories = df[group_by].unique()
         label_dict = {}
         for i, category in enumerate(unique_categories):
             label_dict[category] = i
@@ -142,11 +141,7 @@ class DataVisualizer:
         kmeans = KMeans(n_clusters=len(df[group_by].unique()), random_state=0).fit(std_df)
         new_df[col1] = kmeans.labels_
         new_df[col2] = [label_dict.get(i) for i in new_df[col1]]
-        new_df
-        
 
-
-# obiettivi:
-#if len(df['group_by'])<=8 bar.plot(verticale quindi x e y invertite)
-#scatterplot e regplot
-# Ma se usassimo l' ereditarietà per creare 2 sotto classi di data_visualizer, una per seaborn e una per matplotlib
+        sns.scatterplot(x=col1, y=col2, data=new_df, hue=group_by)
+        plt.show()
+        print(new_df)

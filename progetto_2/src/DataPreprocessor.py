@@ -28,6 +28,7 @@ class DataPreprocessor:
         self.transform_age(df, 'Content Rating')
         #self.drop_unnamed(df)
         self.save_to_csv(df)
+        #self.corr_df(df)
 
         return df
 
@@ -122,3 +123,17 @@ class DataPreprocessor:
     def save_to_csv(self, df):
 
         df.to_csv('processed_googleplaystore.csv')
+
+    '''def corr_df(self, df):
+            #pearson
+            std_df = df.corr(method='pearson', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/pearson_processed_googleplaystore.csv')
+            #spearman
+            std_df = df.corr(method='spearman', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/spearman_processed_googleplaystore.csv')
+            #kendall
+            std_df = df.corr(method='kendall', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/kendall_processed_googleplaystore.csv')'''

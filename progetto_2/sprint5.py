@@ -24,28 +24,40 @@ sns_vis = DataVisualizer(library="seaborn")
 plt_vis = DataVisualizer(library="matplotlib")
 
 # 1-Find if there is a correlation between the price of the apps and the category (Teen, Everyone, Mature). 
-def scatter_plot(df, col1, col2, method, hue): 
+# L’età misurata per fasce (0-13 anni, 13-17 anni, 17-18 anni, 18 in su.) è una variabile qualitativa ordinale 
+# e pertanto sarà necessario scegliere un altro metodo di analisi, come la correlazione di SPEARMAN o la correlazione di KENDALL.
+def scatter_plot(df, col1, col2, method, hue, selected_categories=False): 
     
-    x=df[col1]
-    y=df[col2]
-    result = x.corr(y, method=method)
+    if selected_categories==True:
+        df = df.loc[(df[hue]=='Teen') | (df[hue]=='Everyone') | (df[col2]>=17)]
+        x=df[col1]
+        y=df[col2]
+        result = x.corr(y, method=method)
+        print(result)
+
+    else:
+        x=df[col1]
+        y=df[col2]
+        result = x.corr(y, method=method)
+        print(result)
 
     #seaborn
     sns.scatterplot(x=x, y=y, data=df, hue=hue)
-    plt.title(f"{method} correlation coefficient: {result}")
+    plt.title(f"The {method} correlation coefficient: {result}")
     plt.xlabel(f'Number of {col1}')
     plt.ylabel(f'Total {col2}')
     plt.show()
 
     #matplotlib.pyplot
     plt.scatter(x=col1, y=col2, data=df, color='c')
-
-    plt.title(f"{method} correlation coefficient: {result}")
+    plt.title(f"The {method} correlation coefficient: {result}")
     plt.xlabel(f'Number of {col1}')
     plt.ylabel(f'Total {col2}')
     plt.show()
     
-scatter_plot(df, 'Price', 'Age Restriction', 'pearson', 'Content Rating')
+scatter_plot(df, 'Price', 'Age Restriction', 'spearman', 'Content Rating', selected_categories=True)
+
+
 
 #2-find the sentiment of all apps using np files (negative words and positive words) and "afinn" lib 
 #link for np files https://drive.google.com/drive/folders/1824UvFm8WBcOX_iiev0kNMrDu7aUARra?usp=share_link

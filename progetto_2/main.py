@@ -3,6 +3,7 @@ import numpy as np
 
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
+from src.DataVisualizer import DataVisualizer
 
 di = DataIngestor()
 
@@ -15,7 +16,18 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
+df= di.load_file('processed_googleplaystore.csv')
 
 print(df)
 print(df.dtypes)
 print(df.isna().sum())
+
+sns_vis = DataVisualizer(library="seaborn")
+sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+sns_vis.scatter_plot(df, 'Installs', 'Reviews')
+sns_vis.countplot(df, var='Category', hue='Type')
+
+plt_vis = DataVisualizer(library="matplotlib")
+plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+plt_vis.scatter_plot(df, 'Installs', 'Reviews')
+plt_vis.countplot(df, var='Category', hue='Type')

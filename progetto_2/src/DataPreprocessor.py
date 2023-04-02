@@ -25,6 +25,10 @@ class DataPreprocessor:
         self.reviews_to_int(df)
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
+        self.transform_age(df, 'Content Rating')
+        #self.drop_unnamed(df)
+        self.save_to_csv(df)
+        #self.corr_df(df)
 
         return df
 
@@ -88,7 +92,7 @@ class DataPreprocessor:
         
     def rating_fillna(self, df):
         ## replacing nan values with mean of the column 
-        mean = df['Rating'].dropna().mean()
+        mean = round(df['Rating'].dropna().mean(), 1)
         df['Rating'].fillna(mean, inplace=True)
         
     def reviews_to_int(self, df):
@@ -108,3 +112,37 @@ class DataPreprocessor:
         # Dropping Nan value(s) left
         if df.isna().sum().any()>0:
             df.dropna(inplace=True)
+
+    def transform_age(self, df, column):
+    # Map string values to integer values
+        age_map = {
+            "Everyone" : 0, 
+            "Everyone 10+": 10,
+            "Teen": 13,
+            "Mature 17+": 17,
+            "Adults only 18+": 18, 
+            "Unrated" : 0
+        }
+        df['Age Restriction'] = df[column].map(age_map).fillna(0).astype(int)
+        df.loc[df['Content Rating'] == 'Unrated', 'Content Rating'] = 'Everyone'
+    
+    def drop_unnamed(self, df):
+        df = df.drop(columns=['Unnamed: 0'])
+    
+    def save_to_csv(self, df):
+
+        df.to_csv('processed_googleplaystore.csv')
+
+    '''def corr_df(self, df):
+            #pearson
+            std_df = df.corr(method='pearson', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/pearson_processed_googleplaystore.csv')
+            #spearman
+            std_df = df.corr(method='spearman', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/spearman_processed_googleplaystore.csv')
+            #kendall
+            std_df = df.corr(method='kendall', numeric_only=True)
+            std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+            std_df.to_csv(r'corr_dataframes/kendall_processed_googleplaystore.csv')'''

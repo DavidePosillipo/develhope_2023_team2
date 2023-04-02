@@ -115,7 +115,7 @@ print(f"\n\nLowest avg sentiment score: {sentiment_scores.nsmallest(5)}")
 
 
 #4-what is the best category according to sentiment values
-df = pd.read_csv("GooglePS.csv") # Specificare nome file in directory repo
+df = pd.read_csv("processed_googleplaystore.csv") # Specificare nome file in directory repo
 afn = Afinn()
 
 #loading data

@@ -20,13 +20,18 @@ class DataVisualizer:
         sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
         sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
-
+        sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
+        sns_vis.growth_trend(df)
 
         plt_vis = DataVisualizer(library="matplotlib")
         plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         plt_vis.scatter_plot(df, 'Installs', 'Reviews')
         plt_vis.countplot(df, var='Category', hue='Type')
+        plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
+        plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+        plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+        plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+        plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
 
     def barh_by_grouping(self, df, column, group_by, agg):
@@ -266,14 +271,13 @@ class DataVisualizer:
 
     def growth_trend(self, df):
 
-        # Selezione colonne da includere nel dataframe
         df = df[['App', 'Category', 'Last Updated']]
         #1 Selezione categorie da mostrare nel grafico
         categories = ['ENTERTAINMENT', 'BUSINESS', 'FAMILY', 'FINANCE', 'PRODUCTIVITY']
-        df = df[df['Category'].isin(categories)]
-        df.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
+        df_main = df[df['Category'].isin(categories)]
+        df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
         #2 group by anno e conteggio numero app per categoria per ogni anno
-        grouped = df.groupby([df['Last Updated'].dt.year, 'Category'])['Category'].count()
+        grouped = df_main.groupby([df_main['Last Updated'].dt.year, 'Category'])['Category'].count()
         #3 Riempi i valori nan con 0
         trend = grouped.unstack(level=1, fill_value=0)
 
@@ -286,10 +290,19 @@ class DataVisualizer:
 
         # Aggiungi la media ricavata al dataframe principale
         trend['Average of other categories'] = trend_else_mean
+        print(df_else)
 
-        # Create plot
-        trend.plot(kind='line', figsize=(10,5))
-        plt.title('App Categories Over Time')
-        plt.xlabel('Year')
-        plt.ylabel('Average Number of Apps')
-        plt.show()
+        # Creazione plot
+        # Seaborn
+        if self.library=='seaborn':
+            sns.lineplot(data=trend)
+            plt.title('App Categories Over Time')
+            plt.xlabel('Year')
+            plt.ylabel('Average Number of Apps')
+            plt.show()
+        else:
+            trend.plot(kind='line', figsize=(10,5))
+            plt.title('App Categories Over Time')
+            plt.xlabel('Year')
+            plt.ylabel('Average Number of Apps')
+            plt.show()

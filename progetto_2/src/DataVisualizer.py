@@ -2,6 +2,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
+import pandas as pd
 
 class DataVisualizer:
 
@@ -119,3 +120,130 @@ class DataVisualizer:
         plt.xlabel(f'Number of {col1}')
         plt.ylabel(f'Total {col2}')
         plt.show()
+
+    def grouped_rating(self, df, by: Literal["Category", "Type"], column, n= None, ascending= False):
+    
+        df_group = df.groupby(by= by)[column].agg(["mean", "max", "min"]).sort_values(["mean", "max", "min"], ascending= [ascending, ascending, ascending]).head(n)
+
+        fig, ax = plt.subplots(figsize= (16, 8))
+
+        if self.library == "seaborn":
+            if type(by) != list:
+                
+                sns.barplot(data= df_group, x= df_group.index, y= "max", color= "g", label= "Max")
+                sns.barplot(data= df_group, x= df_group.index, y= "mean", color= "r", label= "Average")
+                sns.barplot(data= df_group, x= df_group.index, y= "min", color= "b", label= "Min")
+                ax.set_xticklabels(ax.get_xticklabels(), rotation="vertical")
+                ax.set(xlabel= by, ylabel= column)
+                ax.legend() 
+                ax.set_title(f"Rating by {by}")                 
+
+            else:
+                df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
+                df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
+                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["r", "g"])
+                ax.set_ylabel("Rating")
+                ax.set_xticklabels(df_melted.Category.unique(), rotation=90)
+                ax.set_title("Average Rating of free and paid Apps in each Category")
+                ax.legend()
+            
+        else:   
+            if type(by) != list:
+                plt.bar(df_group.index, df_group["max"], color= "g", label='Max')
+                plt.bar(df_group.index, df_group["mean"], color= "r", label='Average')
+                plt.bar(df_group.index, df_group["min"], color= "b", label='Min')
+                plt.legend() 
+                plt.ylabel("Rating")
+                plt.xticks(rotation= "vertical")
+                plt.title(f"Rating by {by}") 
+
+            else:
+                df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).head(n)
+                bar_width = 0.35
+                x = np.arange(len(df_group.index))
+                y_free = df_group.Free.fillna(0).values
+                y_paid = df_group.Paid.fillna(0).values                
+                plt.bar(x - bar_width / 2, y_free, bar_width, color= "r", label="Free")
+                plt.bar(x + bar_width / 2, y_paid, bar_width, color= "g", label="Paid")
+                plt.ylabel("Rating")
+                plt.xticks(x, df_group.index, rotation= "vertical")
+                plt.title("Average Rating of free and paid Apps in each Category")
+                plt.legend()
+                
+        plt.show()
+        
+    
+    def popularity_score(self, df, n= 10, ascending= False, all_info= False, free= "all"):
+
+        df["Popularity"] = round(df.Installs * df.Rating / (int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
+
+        if free != "all":
+            if free == True:
+                df_popularity = df[df["Type"] == "Free"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App","Popularity"]].head(n)
+            else:
+                df_popularity = df[df["Type"] == "Paid"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App", "Popularity"]].head(n)
+        else:
+            df_popularity = df.sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App", "Popularity"]].head(n)
+        
+        fig, ax = plt.subplots(figsize= (16, 8))
+        
+        if self.library == "seaborn":
+            sns.barplot(x= df_popularity["App"], y= df_popularity["Popularity"], palette=  "viridis")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation="vertical")
+            ax.set(xlabel= "Apps", ylabel= f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
+            ax.set_title("Top 10 Apps by Popularity")
+            
+        else:
+            plt.bar(df_popularity["App"], df_popularity["Popularity"])
+            plt.xticks(rotation= "vertical")
+            plt.xlabel("Apps")
+            plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
+            plt.title("Top 10 Apps by Popularity")
+
+        plt.show()
+    
+    def rating_counter(self, df, column, by: Literal["Category", "Type"], n= None, ascending= False):
+
+        data = df.groupby(by= by)[column].apply(lambda x: pd.cut(x, bins= [1,2,3,4,5]).value_counts()).unstack()
+        
+        fig, ax = plt.subplots(figsize= (16, 8))
+
+        if self.library == "seaborn":
+            data.columns = ["1-2", "2-3", "3-4", "4-5"]  
+
+            if by == "Category":    
+                data = data[["4-5", "3-4", "2-3", "1-2"]]
+            elif "Type" in by:
+                data.columns = ["4-5", "3-4", "2-3", "1-2"]
+
+            data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
+            data_melted = data.reset_index().melt(id_vars= by, var_name= "Rating", value_name= "App Count")
+            sns.barplot(x= by, y= "App Count", data= data_melted, hue= "Rating")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
+            ax.set(xlabel= "Categories", ylabel= "App Count")   
+            ax.set_title(f"Number of Apps in each Rating range devided by {by}")
+            
+        else:
+            if "Category" in by:
+                data.columns = ["1-2", "2-3", "3-4", "4-5"]
+            elif "Type" in by:
+                data.columns = ["4-5", "3-4", "2-3", "1-2"]
+                 
+            data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
+            x = np.arange(df[by].nunique())*1.75
+            x1 = data["4-5"]
+            x2 = data["3-4"]
+            x3 = data["2-3"]
+            x4 = data["1-2"]
+                
+            plt.bar(x - (9*0.1) / 2, x1, 0.3, label= "4-5")
+            plt.bar(x - (3*0.1) / 2, x2, 0.3, label= "3-4")
+            plt.bar(x + (3*0.1) / 2, x3, 0.3, label= "2-3")
+            plt.bar(x + (9*0.1) / 2, x4, 0.3, label= "1-2")
+            plt.xticks(x, df[by].unique(), rotation= "vertical")
+            plt.ylabel("App Count")
+            plt.legend()
+            plt.title(f"Number of Apps in each Rating range devided by {by}")
+            
+        plt.show()  
+    

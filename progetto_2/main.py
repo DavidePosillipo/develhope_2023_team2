@@ -18,16 +18,24 @@ df = dp.pipeline(df)
 
 df= di.load_file('processed_googleplaystore.csv')
 
-print(df)
+"""print(df)
 print(df.dtypes)
-print(df.isna().sum())
+print(df.isna().sum())"""
+
+sns_vis = DataVisualizer("seaborn")
+
 
 sns_vis = DataVisualizer(library="seaborn")
-sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+"""sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
 sns_vis.scatter_plot(df, 'Installs', 'Reviews')
-sns_vis.countplot(df, var='Category', hue='Type')
+sns_vis.countplot(df, var='Category', hue='Type')"""
+sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
+sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
 
-plt_vis = DataVisualizer(library="matplotlib")
+"""plt_vis = DataVisualizer(library="matplotlib")
 plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
 plt_vis.scatter_plot(df, 'Installs', 'Reviews')
-plt_vis.countplot(df, var='Category', hue='Type')
+plt_vis.countplot(df, var='Category', hue='Type')"""

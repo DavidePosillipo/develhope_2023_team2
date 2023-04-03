@@ -29,7 +29,7 @@ plt_vis = DataVisualizer(library="matplotlib")
 # e pertanto sarà necessario scegliere un altro metodo di analisi, come la correlazione di SPEARMAN o la correlazione di KENDALL.
 def scatter_plot(df, col1, col2, method, hue, selected_categories=False): 
     
-    if selected_categories==True:
+    if selected_categories==True: # Documentazione convenzione google
         df = df.loc[(df[hue]=='Teen') | (df[hue]=='Everyone') | (df[col2]>=17)]
         x=df[col1]
         y=df[col2]
@@ -56,7 +56,7 @@ def scatter_plot(df, col1, col2, method, hue, selected_categories=False):
     plt.ylabel(f'Total {col2}')
     plt.show()
     
-scatter_plot(df, 'Price', 'Age Restriction', 'spearman', 'Content Rating', selected_categories=True)
+scatter_plot(df, 'Price', 'Age Restriction', 'spearman', 'Content Rating', selected_categories=False)
 
 
 

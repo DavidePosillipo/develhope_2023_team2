@@ -16,6 +16,12 @@ class DataVisualizer:
         sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         sns_vis.scatter_plot(df, 'Installs', 'Reviews')
         sns_vis.countplot(df, var='Category', hue='Type')
+        sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
+        sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+        sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+        sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+        sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
+
 
         plt_vis = DataVisualizer(library="matplotlib")
         plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
@@ -259,38 +265,31 @@ class DataVisualizer:
         plt.show()  
 
     def growth_trend(self, df):
-        
-        # Seleziona le colonne necessarie per l'analisi dei trend
-        df = df[['Category', 'Last Updated']]
 
-        # Converti la colonna 'Last Updated' in formato datetime
-        df['Last Updated'] = pd.to_datetime(df['Last Updated'])
-
-        # Raggruppa i dati per anno e conteggia le applicazioni per categoria
+        # Selezione colonne da includere nel dataframe
+        df = df[['App', 'Category', 'Last Updated']]
+        #1 Selezione categorie da mostrare nel grafico
+        categories = ['ENTERTAINMENT', 'BUSINESS', 'FAMILY', 'FINANCE', 'PRODUCTIVITY']
+        df = df[df['Category'].isin(categories)]
+        df.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
+        #2 group by anno e conteggio numero app per categoria per ogni anno
         grouped = df.groupby([df['Last Updated'].dt.year, 'Category'])['Category'].count()
-        s = pd.Series(grouped)
+        #3 Riempi i valori nan con 0
+        trend = grouped.unstack(level=1, fill_value=0)
 
-        # Calcola la media delle categorie
-        means = grouped.mean()
+        # Ripeti i passaggi 1, 2, 3 per creare un altro dataframe che possa computare la media delle categorie mancanti
+        df_else = df[~df['Category'].isin(categories)]
+        df_else.loc[:, 'Last Updated'] = pd.to_datetime(df_else['Last Updated'])
+        grouped_else = df_else.groupby([df_else['Last Updated'].dt.year, 'Category'])['Category'].count()
+        trend_else = grouped_else.unstack(level=1, fill_value=0)
+        trend_else_mean = trend_else.mean(axis=1)
 
-        # Selezione delle tre categorie da visualizzare
-        top_3_categories = grouped.nlargest(3).index.tolist()
-        worst_3_categories = grouped.nsmallest(3).index.tolist()
-        
+        # Aggiungi la media ricavata al dataframe principale
+        trend['Average of other categories'] = trend_else_mean
 
-        # Creazione indice categorie selezionate
-        selected_categories = top_3_categories + worst_3_categories
-        df_selected = grouped.unstack().loc[:, selected_categories]
-
-        # Calcola la media delle categorie restanti ed aggiungi i valori ad un nuovo dataframe
-        other_categories_mean = grouped.unstack().drop(columns=selected_categories).mean(axis=1)
-        df_other_categories_mean = pd.DataFrame({ 'Average of other categories': other_categories_mean })
-
-        # Concatena i dataframe 
-        df_final = pd.concat([df_selected, df_other_categories_mean], axis=1)
-
-        # Grafico a linee dei trend di crescita delle categorie di app nel tempo
-        df_final.plot(kind='line', figsize=(10, 5), legend=True, title='Trend di crescita del numero di applicazioni per categoria')
-
-        # Visualizza il grafico
+        # Create plot
+        trend.plot(kind='line', figsize=(10,5))
+        plt.title('App Categories Over Time')
+        plt.xlabel('Year')
+        plt.ylabel('Average Number of Apps')
         plt.show()

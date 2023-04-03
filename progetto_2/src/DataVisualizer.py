@@ -22,6 +22,7 @@ class DataVisualizer:
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
+        sns_vis.correlation_heatmap(df)
 
         plt_vis = DataVisualizer(library="matplotlib")
         plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
@@ -33,6 +34,7 @@ class DataVisualizer:
         plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
+        plt_vis.correlation_heatmap(df)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
@@ -306,3 +308,38 @@ class DataVisualizer:
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
             plt.show()
+
+    def correlation_heatmap(self, df):
+        std_df = df.corr()
+        std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
+        
+        if self.library=='seaborn':
+            plt.figure(figsize = (15,6))
+            sns.heatmap(std_df, annot=True)
+        else:
+            # Create a colormap
+            cmap = plt.get_cmap('magma')
+
+            # Plot the matrix
+            fig, ax = plt.subplots(figsize=(15, 6))
+            im = ax.imshow(std_df, cmap=cmap, extent=[0, len(std_df.columns), 0, len(std_df.columns)], origin='lower')
+
+            # Set ticks and labels
+            xticks = np.arange(0.5, len(std_df.columns), 1)
+            yticks = np.arange(0.5, len(std_df.columns), 1)
+            ax.set_xticks(xticks, minor=False)
+            ax.set_yticks(yticks, minor=False)
+            ax.set_xticklabels(std_df.columns, fontsize=15, rotation=65)
+            ax.set_yticklabels(std_df.columns, fontsize=15)
+
+            # Set colorbar
+            cbar = fig.colorbar(im, ax=ax, orientation='vertical')
+            cbar.ax.tick_params(labelsize=15, rotation=90)  # Set font size and rotation of colorbar labels
+
+            # Loop over data dimensions and create text annotations
+            for i in range(len(std_df.columns)):
+                for j in range(len(std_df.columns)):
+                    text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
+                                ha="center", va="center", color="white", fontsize=12)
+        plt.title('Correlation heatmap')
+        plt.show()

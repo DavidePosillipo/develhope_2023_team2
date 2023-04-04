@@ -11,16 +11,16 @@ class DataIngestor:
         elif format == 'csv':
             return pd.read_csv(path)
         elif format == 'xlsx':
-            return pd.read_xlsx(path)
+            return pd.read_excel(path)
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         
-    def save_file(self, path, format):
+    def save_file(self, df, path, format):
         if format == 'pickle':
-            return pd.to_pickle(path)
+            return df.to_pickle(path)
         elif format == 'csv':
-            return pd.to_csv(path)
+            return df.to_csv(path)
         elif format == 'xlsx':
-            return pd.to_xlsx(path)
+            return df.to_excel(path)
         else:
             return 'Apoligies, but this format has not been implemented yet.'

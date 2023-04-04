@@ -4,18 +4,23 @@ import numpy as np
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
 from src.DataVisualizer import DataVisualizer
+from src.DataAnalyzer import DataAnalyzer
 
 di = DataIngestor()
+dp = DataPreprocessor()
+dv = DataVisualizer("seaborn")
+da = DataAnalyzer()
 
 df = di.load_file('database/raw/googleplaystore.csv', 'csv')
-
-
-dp = DataPreprocessor()
-
-df = dp.pipeline(df)
-
+df = dp.pipeline(df) # Data cleaning App file
+di.save_file(df, 'database/output/processed_googleplaystore.pickle', 'pickle')
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
-
-dv = DataVisualizer("seaborn")
-
-dv.pipeline(df)
+#dv.pipeline(df)
+df = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')
+df = dp.pipeline_reviews(df) #data cleaning reviews file
+di.save_file(df, 'database/output/processed_reviews.pkl', 'pickle')
+df = di.load_file('database/output/processed_reviews.pkl', 'pickle')
+negative_words = di.load_file('database/raw/n.xlsx', 'xlsx')
+positive_words = di.load_file('database/raw/p.xlsx', 'xlsx')
+print(negative_words['faced'], positive_words['abound'])
+da.pipeline(df, n=negative_words, p=positive_words)

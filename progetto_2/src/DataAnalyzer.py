@@ -1,16 +1,17 @@
 from afinn import Afinn
 import pandas as pd
 
-pos_words = pd.read_excel("database/raw/p.xlsx")["Positive Words"].tolist()
-neg_words = pd.read_excel("database/raw/n.xlsx")["Negative Words"].tolist()
-#print(pos_words)
-df_reviews = pd.read_csv("googleplaystore_user_reviews.csv")
-#print(df_reviews)
+#import the sentiment words files into dataframes
+pos_words = pd.read_excel(r"C:\Users\Crypto.gunner\Desktop\CODING\DevelHope\Progetto_APP\develhope_2023_team2\progetto_2\database\raw\p.xlsx")['abound'].tolist()
+neg_words = pd.read_excel(r"C:\Users\Crypto.gunner\Desktop\CODING\DevelHope\Progetto_APP\develhope_2023_team2\progetto_2\database\raw\n.xlsx")['faced'].tolist()
+
+#import the google users reviews file into a dataframe
+df = pd.read_csv(r'C:\Users\Crypto.gunner\Desktop\CODING\DevelHope\Progetto_APP\develhope_2023_team2\progetto_2\database\raw\googleplaystore_user_reviews.csv')
 afinn = Afinn()
 
 score_list = []
 
-for review in df_reviews["Translated_Review"]:
+for review in df["Translated_Review"]:
     score_tot = 0
     review_words = str(review).lower().split()
 
@@ -22,6 +23,6 @@ for review in df_reviews["Translated_Review"]:
     score_list.append(score_tot)
 
 
-df_reviews["sentiment score"] = pd.Series(score_list)
+df["sentiment score"] = pd.Series(score_list)
 
-print(df_reviews["sentiment score"])
+print(df["sentiment score"])

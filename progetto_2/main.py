@@ -6,16 +6,12 @@ from src.DataPreprocessor import DataPreprocessor
 from src.DataVisualizer import DataVisualizer
 
 di = DataIngestor()
+dp = DataPreprocessor()
+dv = DataVisualizer('seaborn')
+#da = DataAnalyzer()
 
 df = di.load_file('database/raw/googleplaystore.csv', 'csv')
-
-
-dp = DataPreprocessor()
-
 df = dp.pipeline(df)
-
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
-
-dv = DataVisualizer("seaborn")
-
 dv.pipeline(df)
+

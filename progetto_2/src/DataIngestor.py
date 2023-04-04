@@ -24,3 +24,18 @@ class DataIngestor:
             return df.to_excel(path)
         else:
             return 'Apoligies, but this format has not been implemented yet.'
+        
+    def load_to_list(self, path, col, format):
+
+        if format == 'pickle':
+            df = pd.read_pickle(path)
+            return df.iloc[:, col]
+        elif format == 'csv':
+            df = pd.read_csv(path)
+            return df.iloc[:, col]
+        elif format == 'xlsx':
+            df = pd.read_excel(path)
+            return df.iloc[:, col]
+        else:
+            return 'Apoligies, but this format has not been implemented yet.'
+        

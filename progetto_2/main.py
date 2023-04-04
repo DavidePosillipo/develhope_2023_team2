@@ -7,14 +7,14 @@ from src.DataVisualizer import DataVisualizer
 
 di = DataIngestor()
 
-df = di.load_file('database/raw/googleplaystore.csv')
+df = di.load_file('database/raw/googleplaystore.csv', 'csv')
 
 
 dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
-df= di.load_file('database/output/processed_googleplaystore.pickle')
+df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
 
 dv = DataVisualizer("seaborn")
 

@@ -17,4 +17,5 @@ df = dp.pipeline(df)
 df= di.load_file('database/output/processed_googleplaystore.csv')
 
 dv = DataVisualizer("seaborn")
+
 dv.pipeline(df)

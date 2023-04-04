@@ -198,16 +198,16 @@ class DataVisualizer:
         
     
     def popularity_score(self, df, n= 10, ascending= False, all_info= False, free= "all"):
-
-        df["Popularity"] = round(df.Installs * df.Rating / (int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
+        df_copy = df.copy()
+        df_copy["Popularity"] = round(df_copy.Installs * df_copy.Rating / (int(str(max(df_copy.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
 
         if free != "all":
             if free == True:
-                df_popularity = df[df["Type"] == "Free"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App","Popularity"]].head(n)
+                df_popularity = df_copy[df_copy["Type"] == "Free"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App","Popularity"]].head(n)
             else:
-                df_popularity = df[df["Type"] == "Paid"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App", "Popularity"]].head(n)
+                df_popularity = df_copy[df_copy["Type"] == "Paid"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App", "Popularity"]].head(n)
         else:
-            df_popularity = df.sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df.columns if all_info else ["App", "Popularity"]].head(n)
+            df_popularity = df_copy.sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App", "Popularity"]].head(n)
         
         fig, ax = plt.subplots(figsize= (16, 8))
         

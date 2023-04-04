@@ -1,4 +1,5 @@
 import math
+import pickle
 from typing import Literal
 import numpy as np
 import pandas as pd
@@ -28,7 +29,7 @@ class DataPreprocessor:
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
         self.transform_age(df, 'Content Rating')
-        self.save_to_csv(df)
+        self.save_to_pickle(df)
 
         return df
 
@@ -129,6 +130,6 @@ class DataPreprocessor:
     def drop_unnamed(self, df):
         df = df.drop(columns=['Unnamed: 0'])
     
-    def save_to_csv(self, df):
+    def save_to_pickle(self, df):
 
-        df.to_csv('database/output/processed_googleplaystore.csv')
+        df.to_pickle('database/output/processed_googleplaystore.pickle')

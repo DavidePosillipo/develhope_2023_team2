@@ -14,7 +14,7 @@ dp = DataPreprocessor()
 
 df = dp.pipeline(df)
 
-df= di.load_file('database/output/processed_googleplaystore.csv')
+df= di.load_file('database/output/processed_googleplaystore.pickle')
 
 dv = DataVisualizer("seaborn")
 

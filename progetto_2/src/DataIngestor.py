@@ -10,6 +10,8 @@ class DataIngestor:
             return pd.read_pickle(path)
         elif format == 'csv':
             return pd.read_csv(path)
+        elif format == 'xlsx':
+            return pd.read_xlsx(path)
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         
@@ -18,5 +20,7 @@ class DataIngestor:
             return pd.to_pickle(path)
         elif format == 'csv':
             return pd.to_csv(path)
+        elif format == 'xlsx':
+            return pd.to_xlsx(path)
         else:
             return 'Apoligies, but this format has not been implemented yet.'

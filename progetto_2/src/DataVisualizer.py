@@ -345,7 +345,7 @@ class DataVisualizer:
         plt.title('Correlation heatmap')
         plt.show()
         
-    def sent_category_hbar():
+    def sent_category_hbar(self, ):
         
         afn = Afinn()
 

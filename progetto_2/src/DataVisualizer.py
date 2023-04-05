@@ -20,6 +20,7 @@ class DataVisualizer:
         sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
         sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+        sns_vis.sent_category_hbar()
         sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
         sns_vis.correlation_heatmap(df)
@@ -343,3 +344,29 @@ class DataVisualizer:
                                 ha="center", va="center", color="white", fontsize=12)
         plt.title('Correlation heatmap')
         plt.show()
+        
+    def sent_category_hbar():
+        
+        afn = Afinn()
+
+        #loading data
+        df_rev=pd.read_csv('googleplaystore_user_reviews.csv')
+        df_app = pd.read_csv('googleplaystore.csv')
+
+        #cleaning data
+        df_rev.dropna(subset='Translated_Review',inplace=True)
+
+        #scoring each review wirh afinn method
+        df_rev['sentiment_score']=df_rev['Translated_Review'].map(afn.score)
+
+        #-find the sentiment of all apps using np files (negative words and positive words) and "afinn" lib
+        #computing the mean score for each App
+        result_2=df_rev.groupby(by='App').agg({'sentiment_score':'mean'}).rename(columns={'sentiment_score':'sentiment_score_mean_by_app'})
+        sent_df=result_2.merge(df_app[['App','Category']],how='inner',on='App').rename(columns=                                                                                  {'sentiment_score_mean_by_app':'sentiment_score_mean_by_category'})
+        
+        #sono presetni duplicati in quanto ci sono app con lo stesso nome ma diversa categoria. Mi limito ad eliminare 
+        sent_df.drop_duplicates(subset='App',inplace=True)
+        print(sent_df)
+
+        sns.barplot(
+          sent_df,x='sentiment_score_mean_by_category',y='Category',orient='horizontal')

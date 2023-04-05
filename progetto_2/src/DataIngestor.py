@@ -1,6 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from PIL import Image
 import os
 from typing import Literal

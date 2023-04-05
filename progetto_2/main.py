@@ -23,10 +23,8 @@ df_reviews = di.load_file('database/output/processed_reviews.pkl', 'pickle')
 negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
 positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
 
-df_reviews, df_sentiment = da.pipeline(df_reviews, n=negative_words, p=positive_words)
-
-df_all = df.merge(df_sentiment, on= "App")
+df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n=negative_words, p=positive_words)
 
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
-#dv.pipeline(df)
+dv.pipeline(df, df_all)
 di.load_image('png')

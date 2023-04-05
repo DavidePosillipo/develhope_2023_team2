@@ -12,7 +12,7 @@ class DataVisualizer:
         if seaborn_theme:
             sns.set_theme(style=seaborn_theme)
 
-    def pipeline(self, df):
+    def pipeline(self, df, df_all):
         sns_vis = DataVisualizer(library="seaborn")
         sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         sns_vis.scatter_plot(df, 'Installs', 'Reviews')
@@ -21,10 +21,10 @@ class DataVisualizer:
         sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
         sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        sns_vis.sent_category_hbar()
         sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
         sns_vis.correlation_heatmap(df)
+        sns_vis.sentiment_by_category(df_all)
 
         plt_vis = DataVisualizer(library="matplotlib")
         plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
@@ -37,6 +37,7 @@ class DataVisualizer:
         plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
         plt_vis.correlation_heatmap(df)
+        plt_vis.sentiment_by_category(df_all)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
@@ -351,5 +352,15 @@ class DataVisualizer:
         plt.savefig('./database/output/graphs/correlation_heatmap.png')
         plt.show()
         
-    def sent_category_hbar(self):
-        pass
+    def sentiment_by_category(self, df_all):
+        result = df_all.groupby("Category")["sentiment score"].mean().sort_values(ascending= False)
+
+        fig, ax = plt.subplots(figsize= (16, 8))
+        plt.bar(result.index, result.values)
+        plt.xticks(rotation= 35, ha= "right", fontsize= 8)
+        plt.ylabel("Avg Sentiment")
+        plt.legend()
+        plt.title("Average sentiment per Category")
+        plt.savefig('./database/output/graphs/sentiment_by_category.png')
+        plt.show()
+

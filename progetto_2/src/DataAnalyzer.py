@@ -6,10 +6,10 @@ class DataAnalyzer():
     def __init__(self):
         pass
     
-    def pipeline(self, df, n, p):
-        return self.sentiment_score(df, n, p)
+    def pipeline(self, df, df_reviews, n, p):
+        return self.sentiment_score(df, df_reviews, n, p)
 
-    def sentiment_score(self, df_reviews, p_words, n_words):
+    def sentiment_score(self, df, df_reviews, p_words, n_words):
         
         p_words = p_words.tolist()
         n_words = n_words.tolist()
@@ -35,5 +35,7 @@ class DataAnalyzer():
         df_reviews["sentiment score"] = pd.Series(score_list)
         
         df_sentiment = df_reviews.groupby("App")["sentiment score"].mean()
+   
+        df_all = df.merge(df_sentiment, on= "App")
         
-        return df_reviews, df_sentiment
+        return df_reviews, df_sentiment, df_all

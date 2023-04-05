@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
+from afinn import Afinn
 
 class DataVisualizer:
 
-    def __init__(self, library: Literal["seaborn", "matplotlib"],seaborn_theme: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False):
+    def __init__(self, library: Literal["seaborn", "matplotlib"], style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False):
         self.library = library
-        if seaborn_theme:
-            sns.set_theme(style=seaborn_theme)
+        if style:
+            sns.set_theme(style=style)
 
     def pipeline(self, df):
         sns_vis = DataVisualizer(library="seaborn")
@@ -61,20 +62,23 @@ class DataVisualizer:
         plt.show()
 
 
-    def countplot(self, df, var:str, hue:str=None):
+    def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical']=None):
         # Automatically create a countplot of the specified categorical variable.
         # Optionally a hue can be specified to split the each entry into multiple bars.
         # No need to specify x or y, they are automatically assigned.
 
         fig, ax = plt.subplots()
 
-        if len(df[var].unique()) < 5:
+        if not orientation:
+            orientation = 'orizzontal' if (len(df[var].unique()) > 5) else 'vertical'
+
+        if orientation == 'vertical':
             if not hue:
                 if self.library == 'seaborn':
-                    sns.countplot(x=data.items, color='blue', order=df[var].value_counts().index)
+                    sns.countplot(x=df[var], order=df[var].value_counts().index, color='steelblue')
                 else:
-                    data = df['Category'].value_counts().sort_values(ascending=True)
-                    plt.bar(x=data.index, height=data.values, color='blue')
+                    data = df[var].value_counts().sort_values(ascending=True)
+                    plt.bar(x=data.index, height=data.values)
             else:
                 if self.library == 'seaborn':
                     sns.countplot(x=df[var], hue=df[hue], order=df[var].value_counts().index)
@@ -96,10 +100,10 @@ class DataVisualizer:
         else:
             if not hue:
                 if self.library == 'seaborn':
-                    sns.countplot(y=df[var], color='blue', order=df[var].value_counts().index)
+                    sns.countplot(y=df[var], order=df[var].value_counts().index, color='steelblue')
                 else:
                     data = df['Category'].value_counts(ascending=True)
-                    plt.barh(y=data.index, width=data.values,color='blue')
+                    plt.barh(y=data.index, width=data.values)
             else:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
@@ -345,13 +349,13 @@ class DataVisualizer:
         plt.title('Correlation heatmap')
         plt.show()
         
-    def sent_category_hbar():
+    def sent_category_hbar(self):
         
         afn = Afinn()
 
         #loading data
-        df_rev=pd.read_csv('googleplaystore_user_reviews.csv')
-        df_app = pd.read_csv('googleplaystore.csv')
+        df_rev=pd.read_csv(r'database\raw\googleplaystore_user_reviews.csv')
+        df_app = pd.read_csv(r'database\raw\googleplaystore.csv')
 
         #cleaning data
         df_rev.dropna(subset='Translated_Review',inplace=True)

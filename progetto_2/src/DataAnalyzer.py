@@ -6,24 +6,13 @@ class DataAnalyzer():
     def __init__(self):
         pass
     
-    def pipeline(self, df, n, p):
-        self.sentiment_score(df, n, p)
+    def pipeline(self, df):
+        sentiment_score = df.groupby('App')['Score'].agg(Sentiment_score='mean').reset_index()
+        return sentiment_score
+        
 
-    def sentiment_score(self, df, n, p):
-        afinn = Afinn()
-
-        score_list = []
-
-        for review in df["Translated_Review"]:
-            score_tot = 0
-            review_words = str(review).lower().split()
-
-            for word in review_words:
-                word = word.lower()
-                if (word in p) or (word in n):
-                    score_tot += afinn.score(word)
-
-            score_list.append(score_tot)
-
-        df["sentiment score"] = pd.Series(score_list)
-        print(df)
+    def sentiment_score(self, df):
+        
+        afn = Afinn()
+        df['Score'] = df['Translated_Review'].apply(afn.score)
+        return df

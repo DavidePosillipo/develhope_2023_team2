@@ -9,7 +9,41 @@ from afinn import Afinn
 #ask them to search about afinn lib 
 afn = Afinn()
 
-#loading data
+from src.DataIngestor import DataIngestor
+from src.DataPreprocessor import DataPreprocessor
+from src.DataVisualizer import DataVisualizer
+from src.DataAnalyzer import DataAnalyzer
+
+di = DataIngestor()
+dp = DataPreprocessor()
+dv = DataVisualizer("seaborn")
+da = DataAnalyzer()
+
+df = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')
+df = dp.pipeline_reviews(df) #data cleaning reviews file
+di.save_file(df, 'database/output/processed_reviews.pkl', 'pickle')
+df = di.load_file('database/output/processed_reviews.pkl', 'pickle')
+
+df_n = da.sentiment_score(df)
+di.save_file(df_n, 'database/output/processed_reviews.pkl', 'pickle')
+df = di.load_file('database/output/processed_reviews.pkl', 'pickle')
+da.pipeline(df)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''#loading data
 df_rev=pd.read_csv('database/raw/googleplaystore_user_reviews.csv')
 #cleaning data
 df_rev.dropna(subset='Translated_Review',inplace=True)
@@ -78,4 +112,4 @@ df_scored_apps = df.join(app_score['review_score_mean_by_app'], on= "App").dropn
 #find the best category
 best_category = df_scored_apps.groupby("Category")["review_score_mean_by_app"].mean().sort_values(ascending= False).head(1)
 
-print(best_category)
+print(best_category)'''

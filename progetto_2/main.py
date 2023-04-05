@@ -13,7 +13,7 @@ da = DataAnalyzer()
 
 df = di.load_file('database/raw/googleplaystore.csv', 'csv')
 df = dp.pipeline(df) # Data cleaning App file
-di.save_file(df, 'database/output/processed_googleplaystore.pickle', 'pickle')
+di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
 #dv.pipeline(df)
 df = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')

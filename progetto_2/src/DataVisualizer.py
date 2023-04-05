@@ -59,6 +59,7 @@ class DataVisualizer:
         ax.set(title = f'{column} by {group_by}',
                 xlabel = column,
                 ylabel= group_by)
+        plt.savefig('./database/output/graphs/barplot.png')
         plt.show()
 
 
@@ -122,6 +123,7 @@ class DataVisualizer:
                     
 
         ax.set(title=f'Number of apps with for each {var} value')
+        plt.savefig('./database/output/graphs/countplot.png')
         plt.show()
         
 
@@ -145,6 +147,7 @@ class DataVisualizer:
         plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
         plt.xlabel(f'Number of {col1}')
         plt.ylabel(f'Total {col2}')
+        plt.savefig('./database/output/graphs/scatterplot.png')
         plt.show()
 
     def grouped_rating(self, df, by: Literal["Category", "Type"], column, n= None, ascending= False):
@@ -195,7 +198,7 @@ class DataVisualizer:
                 plt.xticks(x, df_group.index, rotation= "vertical")
                 plt.title("Average Rating of free and paid Apps in each Category")
                 plt.legend()
-                
+        plt.savefig('./database/output/graphs/group_rating.png')        
         plt.show()
         
     
@@ -225,7 +228,7 @@ class DataVisualizer:
             plt.xlabel("Apps")
             plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
             plt.title("Top 10 Apps by Popularity")
-
+        plt.savefig('./database/output/graphs/popularity_rating.png')
         plt.show()
     
     def rating_counter(self, df, column, by: Literal["Category", "Type"], n= None, ascending= False):
@@ -270,7 +273,7 @@ class DataVisualizer:
             plt.ylabel("App Count")
             plt.legend()
             plt.title(f"Number of Apps in each Rating range devided by {by}")
-            
+        plt.savefig('./database/output/graphs/rating_counter.png')   
         plt.show()  
 
     def growth_trend(self, df):
@@ -300,16 +303,17 @@ class DataVisualizer:
         # Seaborn
         if self.library=='seaborn':
             sns.lineplot(data=trend)
-            plt.title('App Categories Over Time')
+            plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-            plt.show()
+        
         else:
             trend.plot(kind='line', figsize=(10,5))
-            plt.title('App Categories Over Time')
+            plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-            plt.show()
+        plt.savefig('./database/output/graphs/growth_trend.png')
+        plt.show()
 
     def correlation_heatmap(self, df):
         std_df = df.corr()
@@ -344,30 +348,8 @@ class DataVisualizer:
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
                                 ha="center", va="center", color="white", fontsize=12)
         plt.title('Correlation heatmap')
+        plt.savefig('./database/output/graphs/correlation_heatmap.png')
         plt.show()
         
-    def sent_category_hbar(self, ):
-        
-        afn = Afinn()
-
-        #loading data
-        df_rev=pd.read_csv('googleplaystore_user_reviews.csv')
-        df_app = pd.read_csv('googleplaystore.csv')
-
-        #cleaning data
-        df_rev.dropna(subset='Translated_Review',inplace=True)
-
-        #scoring each review wirh afinn method
-        df_rev['sentiment_score']=df_rev['Translated_Review'].map(afn.score)
-
-        #-find the sentiment of all apps using np files (negative words and positive words) and "afinn" lib
-        #computing the mean score for each App
-        result_2=df_rev.groupby(by='App').agg({'sentiment_score':'mean'}).rename(columns={'sentiment_score':'sentiment_score_mean_by_app'})
-        sent_df=result_2.merge(df_app[['App','Category']],how='inner',on='App').rename(columns=                                                                                  {'sentiment_score_mean_by_app':'sentiment_score_mean_by_category'})
-        
-        #sono presetni duplicati in quanto ci sono app con lo stesso nome ma diversa categoria. Mi limito ad eliminare 
-        sent_df.drop_duplicates(subset='App',inplace=True)
-        print(sent_df)
-
-        sns.barplot(
-          sent_df,x='sentiment_score_mean_by_category',y='Category',orient='horizontal')
+    def sent_category_hbar(self):
+        pass

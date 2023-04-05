@@ -16,7 +16,6 @@ df = di.load_file('database/raw/googleplaystore.csv', 'csv')
 df = dp.pipeline(df) # Data cleaning App file
 di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
-#dv.pipeline(df)
 df_reviews = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')
 df_reviews = dp.pipeline_reviews(df_reviews) #data cleaning reviews file
 di.save_file(df_reviews, 'database/output/processed_reviews.pkl', 'pickle')
@@ -29,3 +28,5 @@ df_reviews, df_sentiment = da.pipeline(df_reviews, n=negative_words, p=positive_
 df_all = df.merge(df_sentiment, on= "App")
 
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
+#dv.pipeline(df)
+di.load_image('png')

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from PIL import Image
 import os
+from typing import Literal
 
 class DataIngestor:
 
@@ -43,16 +44,18 @@ class DataIngestor:
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         
-    def load_image(self, format):
+    def load_image(self, format, library: Literal["seaborn", "matplotlib"]):
 
         if format == 'png':
             directory = './database/output/graphs'
             for filename in os.listdir(directory):
+                if library == 'seaborn' and 'sns' not in filename:
+                    continue
+                if library == 'matplotlib' and 'mat' not in filename:
+                    continue
+            
                 filepath = os.path.join(directory, filename)
                 img = Image.open(filepath)
                 img.show()
-
         else:
             return 'Apologies, but this format has not been implemented yet.'
-
-        

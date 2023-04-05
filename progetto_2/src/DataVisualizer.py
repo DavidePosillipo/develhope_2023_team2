@@ -14,30 +14,30 @@ class DataVisualizer:
 
     def pipeline(self, df, df_all):
         sns_vis = DataVisualizer(library="seaborn")
-        sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+        '''sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         sns_vis.scatter_plot(df, 'Installs', 'Reviews')
-        sns_vis.countplot(df, var='Category', hue='Type')
+        sns_vis.countplot(df, var='Category', hue='Type')'''
         sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
         sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+        '''sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
         sns_vis.correlation_heatmap(df)
-        sns_vis.sentiment_by_category(df_all)
+        sns_vis.sentiment_by_category(df_all)'''
 
         plt_vis = DataVisualizer(library="matplotlib")
-        plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+        '''plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         plt_vis.scatter_plot(df, 'Installs', 'Reviews')
-        plt_vis.countplot(df, var='Category', hue='Type')
+        plt_vis.countplot(df, var='Category', hue='Type')'''
         plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
         plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+        '''plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
         plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
         plt_vis.correlation_heatmap(df)
-        plt_vis.sentiment_by_category(df_all)
+        plt_vis.sentiment_by_category(df_all)'''
 
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
@@ -60,7 +60,7 @@ class DataVisualizer:
         ax.set(title = f'{column} by {group_by}',
                 xlabel = column,
                 ylabel= group_by)
-        plt.savefig('./database/output/graphs/barplot.png')
+        #plt.savefig('./database/output/graphs/barplot.png')
         plt.show()
 
 
@@ -124,7 +124,7 @@ class DataVisualizer:
                     
 
         ax.set(title=f'Number of apps with for each {var} value')
-        plt.savefig('./database/output/graphs/countplot.png')
+        #plt.savefig('./database/output/graphs/countplot.png')
         plt.show()
         
 
@@ -148,7 +148,7 @@ class DataVisualizer:
         plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
         plt.xlabel(f'Number of {col1}')
         plt.ylabel(f'Total {col2}')
-        plt.savefig('./database/output/graphs/scatterplot.png')
+        #plt.savefig('./database/output/graphs/scatterplot.png')
         plt.show()
 
     def grouped_rating(self, df, by: Literal["Category", "Type"], column, n= None, ascending= False):
@@ -171,11 +171,12 @@ class DataVisualizer:
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
                 df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
-                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["r", "g"])
+                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["grey", "orange"])
                 ax.set_ylabel("Rating")
                 ax.set_xticklabels(df_melted.Category.unique(), rotation=90)
                 ax.set_title("Average Rating of free and paid Apps in each Category")
                 ax.legend()
+                plt.savefig('./database/output/graphs/group_rating_type_sns.png')
             
         else:   
             if type(by) != list:
@@ -193,13 +194,14 @@ class DataVisualizer:
                 x = np.arange(len(df_group.index))
                 y_free = df_group.Free.fillna(0).values
                 y_paid = df_group.Paid.fillna(0).values                
-                plt.bar(x - bar_width / 2, y_free, bar_width, color= "r", label="Free")
-                plt.bar(x + bar_width / 2, y_paid, bar_width, color= "g", label="Paid")
+                plt.bar(x - bar_width / 2, y_free, bar_width, color= "grey", label="Free")
+                plt.bar(x + bar_width / 2, y_paid, bar_width, color= "orange", label="Paid")
                 plt.ylabel("Rating")
                 plt.xticks(x, df_group.index, rotation= "vertical")
                 plt.title("Average Rating of free and paid Apps in each Category")
                 plt.legend()
-        plt.savefig('./database/output/graphs/group_rating.png')        
+                plt.savefig('./database/output/graphs/group_rating_type_mat.png')
+        #plt.savefig('./database/output/graphs/group_rating.png')        
         plt.show()
         
     
@@ -229,7 +231,7 @@ class DataVisualizer:
             plt.xlabel("Apps")
             plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
             plt.title("Top 10 Apps by Popularity")
-        plt.savefig('./database/output/graphs/popularity_rating.png')
+        #plt.savefig('./database/output/graphs/popularity_rating.png')
         plt.show()
     
     def rating_counter(self, df, column, by: Literal["Category", "Type"], n= None, ascending= False):
@@ -274,7 +276,7 @@ class DataVisualizer:
             plt.ylabel("App Count")
             plt.legend()
             plt.title(f"Number of Apps in each Rating range devided by {by}")
-        plt.savefig('./database/output/graphs/rating_counter.png')   
+        #plt.savefig('./database/output/graphs/rating_counter.png')   
         plt.show()  
 
     def growth_trend(self, df):
@@ -298,7 +300,6 @@ class DataVisualizer:
 
         # Aggiungi la media ricavata al dataframe principale
         trend['Average of other categories'] = trend_else_mean
-        print(df_else)
 
         # Creazione plot
         # Seaborn
@@ -313,7 +314,7 @@ class DataVisualizer:
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-        plt.savefig('./database/output/graphs/growth_trend.png')
+        #plt.savefig('./database/output/graphs/growth_trend.png')
         plt.show()
 
     def correlation_heatmap(self, df):
@@ -349,7 +350,7 @@ class DataVisualizer:
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
                                 ha="center", va="center", color="white", fontsize=12)
         plt.title('Correlation heatmap')
-        plt.savefig('./database/output/graphs/correlation_heatmap.png')
+        #plt.savefig('./database/output/graphs/correlation_heatmap.png')
         plt.show()
         
     def sentiment_by_category(self, df_all):
@@ -361,6 +362,6 @@ class DataVisualizer:
         plt.ylabel("Avg Sentiment")
         plt.legend()
         plt.title("Average sentiment per Category")
-        plt.savefig('./database/output/graphs/sentiment_by_category.png')
+        #plt.savefig('./database/output/graphs/sentiment_by_category.png')
         plt.show()
 

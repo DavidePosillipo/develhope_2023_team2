@@ -27,4 +27,4 @@ df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n=negative_words,
 
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
 dv.pipeline(df, df_all)
-di.load_image('png')
+#di.load_image('png', library='seaborn')

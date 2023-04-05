@@ -12,6 +12,7 @@ dv = DataVisualizer("seaborn")
 da = DataAnalyzer()
 
 df = di.load_file('database/raw/googleplaystore.csv', 'csv')
+
 df = dp.pipeline(df) # Data cleaning App file
 di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
@@ -22,5 +23,7 @@ di.save_file(df, 'database/output/processed_reviews.pkl', 'pickle')
 df = di.load_file('database/output/processed_reviews.pkl', 'pickle')
 negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
 positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
+#print(negative_words)
 #print(negative_words, positive_words, df)
-da.pipeline(df, n=negative_words, p=positive_words)
+df_reviews, df_sentiment = da.pipeline(df, n=negative_words, p=positive_words)
+print(df_reviews, df_sentiment)

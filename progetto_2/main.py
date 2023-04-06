@@ -3,40 +3,49 @@ from src.DataPreprocessor import DataPreprocessor
 from src.DataVisualizer import DataVisualizer
 from src.DataAnalyzer import DataAnalyzer
 
+
 di = DataIngestor()
 dp = DataPreprocessor()
 dv = DataVisualizer("seaborn") # Compatibile con matplotlib e seaborn
 da = DataAnalyzer() # Any list of words formatted in one column
 
-# Carica il file csv contenente informazioni sulle app di Google Play Store
+
+# Uploads csv file containing data about Google Play Store apps
 df = di.load_file('database/raw/googleplaystore.csv', 'csv')
 
-#Applica una pipeline di pulizia dei dati al dataframe
+# Applies a data cleaning pipeline to the dataframe (DataPreprocessor)
 df = dp.pipeline(df) 
 
-# Salva il dataframe elaborato in un file pickle
+# Saves the processed dataframe in a pickle file
 di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')
 
-# Carica il file csv contenente le recensioni degli utenti delle app
+# Loads the csv file containing app user reviews
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
 
-# Carica il file creato
+# Loads the created file
 df_reviews = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')
 
-# Applica una pipeline di pulizia dei dati per le recensioni
+# Applies a data cleaning pipeline for reviews (DataPreprocessor)
 df_reviews = dp.pipeline_reviews(df_reviews) 
 
-# Salva il dataframe elaborato delle recensioni in un file pickle
+# Saves the processed review dataframe to a pickle file
 di.save_file(df_reviews, 'database/output/processed_reviews.pkl', 'pickle')
 
-# Carica il file creato
+# Loads the created file
 df_reviews = di.load_file('database/output/processed_reviews.pkl', 'pickle')
 
-# # Carica i file excel contenenti le liste di parole negative e positive
+# Upload excel files containing negative and positive word lists
 negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
 positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
 
+# Applies a pipeline for sentiment analysis (DataIngestor)
 df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n=negative_words, p=positive_words)
 
+# Saves the processed sentiment dataframe in a pickle file
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
+
+# Applies the data visualization pipeline (DataVisualizer)
 dv.pipeline(df, df_all)
+
+# Loads PNG graphs based on library
+di.load_image('png', library='seaborn')

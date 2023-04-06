@@ -29,10 +29,12 @@ class DataPreprocessor:
         self.transform_age(df, 'Content Rating')
         return df
     
+    
     def pipeline_reviews(self, df):
         df = df.dropna()
         df = df[['App', 'Translated_Review']]
         return df
+    
     
     def drop_outdated(self, df):
         # Drop outdated data by sorting by date and keeping the last entry
@@ -44,6 +46,7 @@ class DataPreprocessor:
                 'Android Ver'], # Ignoring 'Reviews', 'Category', and 'Last Updated'
             keep = 'last', # The last entry is also the most recent one 
             inplace = True)
+        
 
     def item_to_bytes(self, item):
         # Convert the item into multiplying the value for the corresponding
@@ -58,9 +61,11 @@ class DataPreprocessor:
         else:
             return item
 
+
     def to_bytes(self, df, column):
         # Convert the entire column to bytes
         df[column] = df[column].apply(self.item_to_bytes)
+
 
     def estimate_size(self, df):
         # Estimate the average size of every category based on the avilable data and use it to fill the missing value.
@@ -75,28 +80,34 @@ class DataPreprocessor:
             df.loc[(df['Category'] == category) & (df['Size'] == 'Varies with device'), 'Size'] = categories_mean_size[category]
             df.loc[df['Size'].isna(), 'Size'] = categories_mean_size[category]
 
+
     def genre_cleaning(self, df):
         # If the genre is composed by two genres, keep only the first one
         df['Genres'] = df['Genres'].str.split(';', expand=True)[0]
 
+
     def size_to_int(self, df):
         # Casting size column in integer type 
         df['Size'] = df['Size'].astype('Int32')
+
 
     def installs_cleaning(self, df):
         # Extracting numerical values from original column and then concatenating them back together leaving out
         # non numerical digits, and finally casting into integer type 
         df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)
         
+
     def price(self, df):
         # Replacing $ sign with empty and casting values in float type
         df['Price'] = np.array([value.replace('$', '') for value in df['Price']]).astype(float)
         
+
     def rating_fillna(self, df):
         ## replacing nan values with mean of the column 
         mean = round(df['Rating'].dropna().mean(), 1)
         df['Rating'].fillna(mean, inplace=True)
         
+
     def reviews_to_int(self, df):
         # Casting reviews column in integer type 
         n=0
@@ -110,10 +121,12 @@ class DataPreprocessor:
             n+=1
         df['Reviews']=df['Reviews'].astype({'Reviews':'Int32'}, copy=False)
         
+
     def drop_na_values(self, df):
         # Dropping Nan value(s) left
         if df.isna().sum().any()>0:
             df.dropna(inplace=True)
+
 
     def transform_age(self, df, column):
     # Map string values to integer values
@@ -127,6 +140,7 @@ class DataPreprocessor:
         }
         df['Age Restriction'] = df[column].map(age_map).fillna(0).astype(int)
         df.loc[df['Content Rating'] == 'Unrated', 'Content Rating'] = 'Everyone'
+    
     
     def drop_unnamed(self, df):
         df = df.drop(columns=['Unnamed: 0'])

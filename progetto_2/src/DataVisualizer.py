@@ -14,7 +14,7 @@ class DataVisualizer:
 
     def pipeline(self, df, df_all):
         sns_vis = DataVisualizer(library="seaborn")
-        """sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+        sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         sns_vis.scatter_plot(df, 'Installs', 'Reviews')
         sns_vis.countplot(df, var='Category', hue='Type')
         sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -23,11 +23,11 @@ class DataVisualizer:
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
-        sns_vis.correlation_heatmap(df)"""
+        sns_vis.correlation_heatmap(df)
         sns_vis.sent_category_hbar(df_all)
 
         plt_vis = DataVisualizer(library="matplotlib")
-        """plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+        plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
         plt_vis.scatter_plot(df, 'Installs', 'Reviews')
         plt_vis.countplot(df, var='Category', hue='Type')
         plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -36,8 +36,9 @@ class DataVisualizer:
         plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
-        plt_vis.correlation_heatmap(df)"""
+        plt_vis.correlation_heatmap(df)
         plt_vis.sent_category_hbar(df_all)
+
 
 # Creates a horizontal bar chart for a column in a dataframe grouped by another column 
 # using the specified aggregation function.
@@ -201,7 +202,9 @@ class DataVisualizer:
                 
         plt.show()
         
-    
+
+# Calculates the popularity score for each app in a dataframe based on its rating and number
+# of installs, and creates a bar chart for the top 10 apps by popularity score.
     def popularity_score(self, df, n= 10, ascending= False, all_info= False, free= "all"):
         df_copy = df.copy()
         df_copy["Popularity"] = round(df_copy.Installs * df_copy.Rating / (int(str(max(df_copy.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
@@ -384,56 +387,33 @@ class DataVisualizer:
         #plt.savefig('./database/output/graphs/correlation_heatmap.png')
         plt.show()
         
+
+# Creates a bar chart for the average sentiment score of apps in each category.
     def sent_category_hbar(self, df_all):
         result = df_all.groupby("Category")["sentiment score"].mean().sort_values(ascending= False)
 
         fig, ax = plt.subplots(figsize= (16, 8))
-        plt.bar(result.index, result.values)
-        plt.xticks(rotation= 35, ha= "right", fontsize= 8)
-        plt.ylabel("Avg Sentiment")
-        plt.legend()
-        plt.title("Average sentiment per Category")
+
+        if self.library == "seaborn":
+            x = np.arange(len(data.index))
+            width = 0.35
+            print(x)
+            pad= 1.08
+            #fig.tight_layout(rect= (pad, 20, pad, pad))increasing bottom gap to show xticks labals doesn t work
+            sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False))
+            ax.set_xticks(x + width, data.index, rotation= "vertical")
+            ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
+            #plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
+
+        else:
+            data = data.sort_values(ascending= False)
+            plt.bar(data.index, data.values)
+            plt.xticks(rotation= 35, ha= "right", fontsize= 8)
+            plt.ylabel("Avg Sentiment")
+            plt.subplots_adjust(bottom= 0.25)
+            plt.title("Average sentiment per Category")
+            #plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
+
         plt.show()
         
-
-
-
-
     
-"""    def sent_category_hbar(self, df_all):
-        
-        afn = Afinn()
-
-        #loading data
-        df_rev=pd.read_csv('googleplaystore_user_reviews.csv')
-        df_app = pd.read_csv('googleplaystore.csv')
-
-        #cleaning data
-        df_rev.dropna(subset='Translated_Review',inplace=True)
-
-        #scoring each review wirh afinn method
-        df_rev['sentiment_score']=df_rev['Translated_Review'].map(afn.score)
-
-        #-find the sentiment of all apps using np files (negative words and positive words) and "afinn" lib
-        #computing the mean score for each App
-        result_2=df_rev.groupby(by='App').agg({'sentiment_score':'mean'}).rename(columns={'sentiment_score':'sentiment_score_mean_by_app'})
-        sent_df=result_2.merge(df_app[['App','Category']],how='inner',on='App').rename(columns= {'sentiment_score_mean_by_app':'sentiment_score_mean_by_category'})
-        
-        #sono presetni duplicati in quanto ci sono app con lo stesso nome ma diversa categoria. Mi limito ad eliminare 
-        sent_df.drop_duplicates(subset='App',inplace=True)
-        print(sent_df)
-
-        sns.barplot(
-          sent_df,x='sentiment_score_mean_by_category',y='Category',orient='horizontal')
-"""
-
-
-
-
-
-""" #loading data
-        df_rev=pd.read_csv('googleplaystore_user_reviews.csv')
-        df_app = pd.read_csv('googleplaystore.csv')
-
-        #cleaning data
-        df_rev.dropna(subset='Translated_Review',inplace=True)"""

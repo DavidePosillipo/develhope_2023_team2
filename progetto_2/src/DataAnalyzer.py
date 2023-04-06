@@ -1,36 +1,41 @@
 from afinn import Afinn
 import pandas as pd
-import os
 
-# ottieni il percorso della directory contenente il file corrente
-curr_dir = os.path.dirname(os.path.abspath(__file__))
+class DataAnalyzer():
 
-# costruisci il percorso completo al file di dati
-data_file_path_p = os.path.join(curr_dir, "..", "database", "raw", "p.xlsx")
-data_file_path_n = os.path.join(curr_dir, "..", "database", "raw", "n.xlsx")
-#import the sentiment words files into dataframes
-pos_words = pd.read_excel(data_file_path_p)['abound'].tolist()
-neg_words = pd.read_excel(data_file_path_n)['faced'].tolist()
+    def __init__(self):
+        pass
+    
+    def pipeline(self, df, df_reviews, n, p):
+        return self.sentiment_score(df, df_reviews, n, p)
 
-#import the google users reviews file into a dataframe
-data_file_path_reviews = os.path.join(curr_dir, "..", "database", "raw", "googleplaystore_user_reviews.csv")
-df = pd.read_csv(data_file_path_reviews)
-afinn = Afinn()
+    def sentiment_score(self, df, df_reviews, p_words, n_words):
+        
+        p_words = p_words.tolist()
+        n_words = n_words.tolist()
+        
+        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)
+        
+        afinn = Afinn()
 
-score_list = []
+        score_list = []
 
-for review in df["Translated_Review"]:
-    score_tot = 0
-    review_words = str(review).lower().split()
+        for review in df_reviews["Translated_Review"]:
 
-    for word in review_words:
-        word = word.lower()
-        if (word in pos_words) or (word in neg_words):
-            score_tot += afinn.score(word)
+            score_tot = 0
+            review_words = str(review).lower().split()
 
-    score_list.append(score_tot)
+            for word in review_words:
+                word = word.lower()
+                if (word in p_words) or (word in n_words):
+                    score_tot += afinn.score(word)
 
+            score_list.append(score_tot)
 
-df["sentiment score"] = pd.Series(score_list)
-
-print(df["sentiment score"])
+        df_reviews["sentiment score"] = pd.Series(score_list)
+        
+        df_sentiment = df_reviews.groupby("App")["sentiment score"].mean()
+   
+        df_all = df.merge(df_sentiment, on= "App")
+        
+        return df_reviews, df_sentiment, df_all

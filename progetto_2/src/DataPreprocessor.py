@@ -1,6 +1,4 @@
 import math
-import pickle
-from typing import Literal
 import numpy as np
 import pandas as pd
 
@@ -29,10 +27,13 @@ class DataPreprocessor:
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
         self.transform_age(df, 'Content Rating')
-        self.save_to_pickle(df)
-
         return df
-
+    
+    def pipeline_reviews(self, df):
+        df = df.dropna()
+        df = df[['App', 'Translated_Review']]
+        return df
+    
     def drop_outdated(self, df):
         # Drop outdated data by sorting by date and keeping the last entry
         df.sort_values(by='Last Updated', inplace=True)
@@ -129,7 +130,3 @@ class DataPreprocessor:
     
     def drop_unnamed(self, df):
         df = df.drop(columns=['Unnamed: 0'])
-    
-    def save_to_pickle(self, df):
-
-        df.to_pickle('database/output/processed_googleplaystore.pickle')

@@ -18,6 +18,7 @@ class DataIngestor:
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         
+        
     def save_file(self, df, path, format):
         if format == 'pickle':
             return df.to_pickle(path)
@@ -28,19 +29,21 @@ class DataIngestor:
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         
+        
     def load_to_list(self, path, col, format):
 
         if format == 'pickle':
             df = pd.read_pickle(path)
-            return df.iloc[:, col]
+            return df.iloc[:, col].to_list()
         elif format == 'csv':
             df = pd.read_csv(path)
-            return df.iloc[:, col]
+            return df.iloc[:, col].to_list()
         elif format == 'xlsx':
-            df = pd.read_excel(path)
-            return df.iloc[:, col]
+            df = pd.read_excel(path).reset_index(drop= True)
+            return df.iloc[:, col].tolist() 
         else:
             return 'Apoligies, but this format has not been implemented yet.'
+        
         
     def load_image(self, format, library: Literal["seaborn", "matplotlib"]):
 

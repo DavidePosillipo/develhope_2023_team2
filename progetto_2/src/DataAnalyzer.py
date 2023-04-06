@@ -6,13 +6,10 @@ class DataAnalyzer():
     def __init__(self):
         pass
     
-    def pipeline(self, df, df_reviews, n, p):
-        return self.sentiment_score(df, df_reviews, n, p)
+    def pipeline(self, df, df_reviews, n_words, p_words):
+        return self.sentiment_score(df, df_reviews, n_words, p_words)
 
     def sentiment_score(self, df, df_reviews, p_words, n_words):
-        
-        p_words = p_words.tolist()
-        n_words = n_words.tolist()
         
         df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)
         

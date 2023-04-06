@@ -32,13 +32,13 @@ class DataIngestor:
 
         if format == 'pickle':
             df = pd.read_pickle(path)
-            return df.iloc[:, col]
+            return df.iloc[:, col].to_list()
         elif format == 'csv':
             df = pd.read_csv(path)
-            return df.iloc[:, col]
+            return df.iloc[:, col].to_list()
         elif format == 'xlsx':
-            df = pd.read_excel(path)
-            return df.iloc[:, col]
+            df = pd.read_excel(path).reset_index(drop= True)
+            return df.iloc[:, col].tolist() 
         else:
             return 'Apoligies, but this format has not been implemented yet.'
         

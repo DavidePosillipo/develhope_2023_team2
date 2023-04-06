@@ -397,7 +397,7 @@ class DataVisualizer:
         if self.library == "seaborn":
             x = np.arange(len(data.index))
             width = 0.35
-            sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False))
+            sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
             ax.set_xticks(x + width, data.index, rotation= "vertical")
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
             #plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')

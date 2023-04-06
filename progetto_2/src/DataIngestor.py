@@ -1,4 +1,8 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from PIL import Image
+import os
 
 class DataIngestor:
 
@@ -38,4 +42,17 @@ class DataIngestor:
             return df.iloc[:, col]
         else:
             return 'Apoligies, but this format has not been implemented yet.'
+        
+    def load_image(self, format):
+
+        if format == 'png':
+            directory = './database/output/graphs'
+            for filename in os.listdir(directory):
+                filepath = os.path.join(directory, filename)
+                img = Image.open(filepath)
+                img.show()
+
+        else:
+            return 'Apologies, but this format has not been implemented yet.'
+
         

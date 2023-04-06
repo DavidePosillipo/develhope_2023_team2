@@ -39,7 +39,7 @@ negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
 positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
 
 # Applies a pipeline for sentiment analysis (DataIngestor)
-df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n=negative_words, p=positive_words)
+df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
 
 # Saves the processed sentiment dataframe in a pickle file
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')

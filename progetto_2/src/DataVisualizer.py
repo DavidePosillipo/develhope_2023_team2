@@ -390,16 +390,13 @@ class DataVisualizer:
 
 # Creates a bar chart for the average sentiment score of apps in each category.
     def sent_category_hbar(self, df_all):
-        result = df_all.groupby("Category")["sentiment score"].mean().sort_values(ascending= False)
+        data = df_all.groupby("Category")["sentiment score"].mean().sort_values(ascending= False)
 
         fig, ax = plt.subplots(figsize= (16, 8))
 
         if self.library == "seaborn":
             x = np.arange(len(data.index))
             width = 0.35
-            print(x)
-            pad= 1.08
-            #fig.tight_layout(rect= (pad, 20, pad, pad))increasing bottom gap to show xticks labals doesn t work
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False))
             ax.set_xticks(x + width, data.index, rotation= "vertical")
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")

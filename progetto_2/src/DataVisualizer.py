@@ -1,6 +1,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
+import matplotlib.transforms as transforms
 import numpy as np
 import pandas as pd
 
@@ -28,7 +29,7 @@ class DataVisualizer:
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
         elif self.library == 'matplotlib':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -36,9 +37,9 @@ class DataVisualizer:
             self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
             self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
             self.rating_counter(df, "Rating", "Type") 
-            self.growth_trend(df)
+            self.growth_trend(df)'''
             self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
+            #self.sent_category_hbar(df_all)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df.groupby(by=group_by)[column].agg(agg).reset_index()
@@ -419,31 +420,33 @@ class DataVisualizer:
             plt.tick_params(axis='y', rotation=0)
             plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
         else:
-            # Create a colormap
+            # Set color map
             cmap = plt.get_cmap('crest')
 
             # Plot the matrix
-            fig, ax = plt.subplots(figsize=(15, 6))
+            fig, ax = plt.subplots(figsize=(15, 10))
             plt.subplots_adjust(bottom=0.25)
             im = ax.imshow(std_df, cmap=cmap, extent=[0, len(std_df.columns), 0, len(std_df.columns)], origin='lower')
 
             # Set ticks and labels
-            xticks = np.arange(0.5, len(std_df.columns), 1)
-            yticks = np.arange(0.5, len(std_df.columns), 1)
-            ax.set_xticks(xticks, minor=False)
-            ax.set_yticks(yticks, minor=False)
+            ax.set_xticks([x + 0.5 for x in range(len(std_df.columns))])
+            ax.set_yticks([y + 0.5 for y in range(len(std_df.columns))])
             ax.set_xticklabels(std_df.columns, fontsize=15, rotation=90)
             ax.set_yticklabels(std_df.columns, fontsize=15)
 
             # Set colorbar
             cbar = fig.colorbar(im, ax=ax, orientation='vertical')
-            cbar.ax.tick_params(labelsize=15, rotation=90)  # Set font size and rotation of colorbar labels
+            cbar.ax.tick_params(labelsize=15, rotation=0)
 
             # Loop over data dimensions and create text annotations
             for i in range(len(std_df.columns)):
                 for j in range(len(std_df.columns)):
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
-                                ha="center", va="center", color="white", fontsize=12)
+                                ha='center', va='center', color='white', fontsize=12)
+                    
+            # Disable the default grid lines
+            ax.grid(False)
+
             plt.title('Correlation heatmap')
 
             if self.save:

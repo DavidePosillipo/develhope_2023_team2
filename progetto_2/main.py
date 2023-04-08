@@ -6,7 +6,7 @@ from src.DataAnalyzer import DataAnalyzer
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv = DataVisualizer(library="seaborn", style='darkgrid')  # Compatibile con matplotlib e seaborn
+dv = DataVisualizer(library="seaborn", style='darkgrid') 
 da = DataAnalyzer()  # Any list of words formatted in one column
 
 
@@ -35,17 +35,17 @@ di.save_file(df_reviews, 'database/output/processed_reviews.pkl')
 df_reviews = di.load_file('database/output/processed_reviews.pkl')
 
 # Loads excel files containing negative and positive word lists
-#negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
-#positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
+negative_words = di.load_to_list('database/raw/n.xlsx', col=0)
+positive_words = di.load_to_list('database/raw/p.xlsx', col=0)
 
 # Applies a pipeline for sentiment analysis (DataIngestor)
-#df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
+df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
 
 # Saves the processed sentiment dataframe in a pickle file
-#di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
+di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')
 
 # Applies the data visualization pipeline (DataVisualizer)
-#dv.pipeline(df, df_all)
+dv.pipeline(df, df_all)
 
 # Loads PNG graphs based on library
-#di.load_image('png', library='seaborn')
+di.load_image('png', library='seaborn')

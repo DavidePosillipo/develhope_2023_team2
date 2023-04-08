@@ -158,7 +158,9 @@ class DataVisualizer:
         def rho(col1, col2):
             r = np.corrcoef(col1, col2)
             return r[0,1]
-        
+
+        fig, ax = plt.subplots()
+
         x = df[col1]
         y = df[col2]
 
@@ -300,7 +302,8 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
                 ax.set(xlabel= "Categories", ylabel= "App Count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_category_sns.png')    
+                if self.save:
+                    plt.savefig('./database/output/graphs/rating_counter_category_sns.png')    
             elif "Type" in by:
                 data.columns = ["4-5", "3-4", "2-3", "1-2"]
 
@@ -310,7 +313,8 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
                 ax.set(xlabel= "Categories", ylabel= "App Count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_type_sns.png')          
+                if self.save:
+                    plt.savefig('./database/output/graphs/rating_counter_type_sns.png')          
         else:
             if "Category" in by:
                 data.columns = ["1-2", "2-3", "3-4", "4-5"]
@@ -358,6 +362,8 @@ class DataVisualizer:
 
 # Creates a line chart for the number of apps updated each year in different categories.
     def growth_trend(self, df):
+        
+        fig, ax = plt.subplots()
 
         df = df[['App', 'Category', 'Last Updated']]
         #1 Selezione categorie da mostrare nel grafico
@@ -390,9 +396,11 @@ class DataVisualizer:
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-        #plt.savefig('./database/output/graphs/growth_trend.png')
-        if plt.show:
+        
+        if self.show:
             plt.show()
+        if self.save:
+            plt.savefig('./database/output/graphs/growth_trend.png')
 
 
 # Creates a heatmap for the correlation matrix of a dataframe.
@@ -432,8 +440,10 @@ class DataVisualizer:
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
                                 ha="center", va="center", color="white", fontsize=12)
             plt.title('Correlation heatmap')
+
             if self.save:
                 plt.savefig('./database/output/graphs/correlation_heatmap_mat.png')
+
         if self.show:
             plt.show()
         

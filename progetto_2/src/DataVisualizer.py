@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
-from afinn import Afinn
 
 class DataVisualizer:
 
@@ -90,6 +89,7 @@ class DataVisualizer:
         Returns: Display graph.             
         """
         fig, ax = plt.subplots()
+        plt.subplots_adjust(left= 0.3)
 
         if not orientation:
             orientation = 'orizzontal' if (len(df[var].unique()) > 5) else 'vertical'
@@ -207,7 +207,7 @@ class DataVisualizer:
                 ax.set(xlabel= by, ylabel= column)
                 ax.legend() 
                 ax.set_title(f"Rating by {by}")   
-                plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')              
+                plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')              
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
                 df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
@@ -216,7 +216,7 @@ class DataVisualizer:
                 ax.set_xticklabels(df_melted.Category.unique(), rotation=65)
                 ax.set_title("Average Rating of free and paid Apps in each Category")
                 ax.legend()
-                plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
+                plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')
             
         else:   
             if type(by) != list:
@@ -241,7 +241,7 @@ class DataVisualizer:
                 plt.xticks(x, df_group.index, rotation= 65)
                 plt.title("Average Rating of free and paid Apps in each Category")
                 plt.legend()
-                plt.savefig('./database/output/graphs/Rating_distribution_by_category_mat.png')
+                plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
                 
         plt.show()
         
@@ -359,7 +359,7 @@ class DataVisualizer:
 
         df = df[['App', 'Category', 'Last Updated']]
         #1 Selezione categorie da mostrare nel grafico
-        categories = ['ENTERTAINMENT', 'BUSINESS', 'FAMILY', 'FINANCE', 'PRODUCTIVITY']
+        categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
         df_main = df[df['Category'].isin(categories)]
         df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
         #2 group by anno e conteggio numero app per categoria per ogni anno

@@ -27,6 +27,7 @@ class DataPreprocessor:
         self.drop_na_values(df)
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
         self.transform_age(df, 'Content Rating')
+        self.rename_categories(df)
         return df
     
     
@@ -154,3 +155,7 @@ class DataPreprocessor:
     def drop_unnamed(self, df):                                                                                 #       Def Drop_Unnamed:
                                                                                                                 # - Drops the 'Unnamed: 0' column from the DataFrame
         df = df.drop(columns=['Unnamed: 0'])
+
+    def rename_categories(self, df):
+
+        df['Category'] = df['Category'].str.replace('_', ' ').str.capitalize()

@@ -39,9 +39,11 @@ class DataVisualizer:
             self.sent_category_hbar(df_all)
 
 
-# Creates a horizontal bar chart for a column in a dataframe grouped by another column 
-# using the specified aggregation function.
+    # Creates a horizontal bar chart for a column(column) in a dataframe grouped by another column (group_by) 
+    # using the specified aggregation function.
     def barh_by_grouping(self, df, column, group_by, agg):
+        #column: string label of the values column
+        #group_by: column of the feature (eg. Category), reference of the group by
         data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
         
         fig, ax = plt.subplots(figsize=(15, 6))
@@ -67,7 +69,6 @@ class DataVisualizer:
                     ylabel= group_by)
             plt.savefig('./database/output/graphs/barplot_mat.png')
             plt.show()
-
 
 
     def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
@@ -148,7 +149,8 @@ class DataVisualizer:
         plt.show()
 
         
-# Creates a scatter plot for two numerical variables in a dataframe.
+    #Creates a scatter plot for two numerical variables in a dataframe
+    #with regression line col1,col2=labelcolumn1,labecolumn2
     def scatter_plot(self, df, col1, col2): 
         def rho(col1, col2):
             r = np.corrcoef(col1, col2)
@@ -176,7 +178,8 @@ class DataVisualizer:
             plt.show()
 
 
-# Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
+                    #SPECIFIC-FUNC
+        # Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
     def grouped_rating(self, df, by: Literal["Category", "Type"], column, n= None, ascending= False):
     
         df_group = df.groupby(by= by)[column].agg(["mean", "max", "min"]).sort_values(["mean", "max", "min"], ascending= [ascending, ascending, ascending]).head(n)
@@ -232,8 +235,9 @@ class DataVisualizer:
         plt.show()
         
 
-# Calculates the popularity score for each app in a dataframe based on its rating and number
-# of installs, and creates a bar chart for the top 10 apps by popularity score.
+                    #SPECIFIC-FUNC
+    # Computes the popularity score for each app in a dataframe based on its rating and number
+    # of installs, and creates a bar chart for the top 10 apps by popularity score.  
     def popularity_score(self, df, n= 10, ascending= False, all_info= False, free= "all"):
         df_copy = df.copy()
         df_copy["Popularity"] = round(df_copy.Installs * df_copy.Rating / (int(str(max(df_copy.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
@@ -266,10 +270,13 @@ class DataVisualizer:
         plt.show()
 
 
-# Creates a bar chart for the number of apps in each rating range divided by a categorical 
-# variable such as category or type.    
-    def rating_counter(self, df, column, by: Literal["Category", "Type"], n= None, ascending= False):
-
+                                 #SPECIFIC-FUNC
+    # Creates a bar chart for the number of apps in each rating range divided by a categorical 
+    # variable implemented as category and type. group_by variable may be a list
+    def rating_counter(self, df, column, group_by: Literal["Category", "Type"], n= None, ascending= False):
+        #column: label of the values column
+        #group_by: column of the feature (eg. Category), reference of the group by
+        
         data = df.groupby(by= by)[column].apply(lambda x: pd.cut(x, bins= [1,2,3,4,5]).value_counts()).unstack()
         
         fig, ax = plt.subplots(figsize= (16, 8))
@@ -341,7 +348,8 @@ class DataVisualizer:
                 plt.show()  
 
 
-# Creates a line chart for the number of apps updated each year in different categories.
+                                 #SPECIFIC-FUNC
+    # Creates a line chart for the number of apps updated each year in different categories.            
     def growth_trend(self, df):
 
         df = df[['App', 'Category', 'Last Updated']]
@@ -381,7 +389,9 @@ class DataVisualizer:
         plt.show()
 
 
-# Creates a heatmap for the correlation matrix of a dataframe.
+    # Creates a heatmap of the correlation matrix of a dataframe.
+    # df: dataframe containing the columns between which to do the correlation
+    # output: graph
     def correlation_heatmap(self, df):
         std_df = df.corr()
         std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])

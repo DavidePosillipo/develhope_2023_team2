@@ -6,8 +6,8 @@ from src.DataAnalyzer import DataAnalyzer
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv = DataVisualizer("seaborn") # Compatibile con matplotlib e seaborn
-da = DataAnalyzer() # Any list of words formatted in one column
+dv = DataVisualizer("seaborn")  # Compatibile con matplotlib e seaborn
+da = DataAnalyzer()  # Any list of words formatted in one column
 
 
 # Uploads csv file containing data about Google Play Store apps
@@ -34,7 +34,7 @@ di.save_file(df_reviews, 'database/output/processed_reviews.pkl', 'pickle')
 # Loads the created file
 df_reviews = di.load_file('database/output/processed_reviews.pkl', 'pickle')
 
-# Upload excel files containing negative and positive word lists
+# Loads excel files containing negative and positive word lists
 negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
 positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
 

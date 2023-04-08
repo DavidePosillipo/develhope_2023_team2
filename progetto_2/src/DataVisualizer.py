@@ -13,31 +13,33 @@ class DataVisualizer:
             sns.set_theme(style=style)
 
     def pipeline(self, df, df_all):
-        sns_vis = DataVisualizer(library="seaborn")
-        sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        sns_vis.scatter_plot(df, 'Installs', 'Reviews')
-        sns_vis.countplot(df, var='Category', hue='Type')
-        sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-        sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-        sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
-        sns_vis.growth_trend(df)
-        sns_vis.correlation_heatmap(df)
-        sns_vis.sent_category_hbar(df_all)
+        if self.library == 'seaborn':
+            sns_vis = DataVisualizer(library="seaborn")
+            sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            sns_vis.scatter_plot(df, 'Installs', 'Reviews')
+            sns_vis.countplot(df, var='Category', hue='Type')
+            sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
+            sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+            sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+            sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+            sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
+            sns_vis.growth_trend(df)
+            sns_vis.correlation_heatmap(df)
+            sns_vis.sent_category_hbar(df_all)
 
-        plt_vis = DataVisualizer(library="matplotlib")
-        plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        plt_vis.scatter_plot(df, 'Installs', 'Reviews')
-        plt_vis.countplot(df, var='Category', hue='Type')
-        plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-        plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-        plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        plt_vis.rating_counter(df, "Rating", "Type") 
-        plt_vis.growth_trend(df)
-        plt_vis.correlation_heatmap(df)
-        plt_vis.sent_category_hbar(df_all)
+        if self.library == 'matplotlib':
+            plt_vis = DataVisualizer(library="matplotlib")
+            plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            plt_vis.scatter_plot(df, 'Installs', 'Reviews')
+            plt_vis.countplot(df, var='Category', hue='Type')
+            plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
+            plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+            plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+            plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+            plt_vis.rating_counter(df, "Rating", "Type") 
+            plt_vis.growth_trend(df)
+            plt_vis.correlation_heatmap(df)
+            plt_vis.sent_category_hbar(df_all)
 
 
 # Creates a horizontal bar chart for a column in a dataframe grouped by another column 
@@ -68,8 +70,23 @@ class DataVisualizer:
         plt.show()
 
 
-# Creates a countplot for a categorical variable in a dataframe with or without a hue variable.
-    def countplot(self, df, var:str, hue:str=None):
+
+    def countplot(self, df, var:str, hue:str=None, orientation = Literal['orizzontal', 'vertical']):
+        """Creates a countplot for a variable in a dataframe with or without a hue variable.
+        
+        Args:
+            df: DataFrame
+                Dataset for plotting
+            var: str
+                Name of a variable to plot
+            hue: str, optional
+                Name of a variable in which splitting the data for each var entry
+                in different bars
+            orientation: str, optional
+                Allows to specify the orientation of the graph. If not given the orientation
+                is decided based on the number of unique values in var.
+        Returns: Display graph.             
+        """
         fig, ax = plt.subplots()
 
         if not orientation:

@@ -6,15 +6,15 @@ class DataAnalyzer():
     def __init__(self):
         pass
     
-    def pipeline(self, df, df_reviews, n_words, p_words):
-        return self.sentiment_score(df, df_reviews, n_words, p_words)
+    def pipeline(self, df, df_reviews, n_words, p_words):                                                  #      Def Pipeline:
+        return self.sentiment_score(df, df_reviews, n_words, p_words)                                      # - Runs DataAnalizer pipeline's methods 
 
-    def sentiment_score(self, df, df_reviews, p_words, n_words):
-        
-        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)
-        
-        afinn = Afinn()
-
+    def sentiment_score(self, df, df_reviews, p_words, n_words):                                           #      Def Sentiment_Score:                                                                                                                                                         
+                                                                                                           # - Filters out rows with missing translated reviews
+        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)           # - Aggregates sentiment scores by App
+                                                                                                           # - Calculates sentiment scores for each review using Afinn
+        afinn = Afinn()                                                                                    # - Merges aggregated scores with the original DataFrame #
+                                                                                                           # - Returns the updated DataFrames
         score_list = []
 
         for review in df_reviews["Translated_Review"]:

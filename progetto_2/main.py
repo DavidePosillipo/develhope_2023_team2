@@ -6,7 +6,7 @@ from src.DataAnalyzer import DataAnalyzer
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv = DataVisualizer(library="seaborn", style='darkgrid') 
+dv = DataVisualizer(library="seaborn", style='darkgrid', show=True, save=False) 
 da = DataAnalyzer()  # Any list of words formatted in one column
 
 
@@ -48,4 +48,4 @@ di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')
 dv.pipeline(df, df_all)
 
 # Loads PNG graphs based on library
-di.load_image('png', library='seaborn')
+#di.load_image('png', library='seaborn')

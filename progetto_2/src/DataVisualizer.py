@@ -6,8 +6,11 @@ import pandas as pd
 
 class DataVisualizer:
 
-    def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False):
+    def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False,
+                 show: bool = True, save: bool = False):
         self.library = library
+        self.show = show
+        self.save = save
         if style:
             sns.set_theme(style=style)
 
@@ -24,7 +27,6 @@ class DataVisualizer:
             self.growth_trend(df)
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
-
         elif self.library == 'matplotlib':
             self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
@@ -53,10 +55,10 @@ class DataVisualizer:
                         x=column,
                         color="b")
             plt.title(f'{column} by {group_by}')
-            plt.savefig('./database/output/graphs/barplot_sns.png')
-            plt.show()
+            if self.save:
+                plt.savefig('./database/output/graphs/barplot_sns.png')
 
-        else:
+        elif self.library == 'matplotlib':
             # FYI Seaborn e matplotlib order opposite ways
             data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index().sort_values(by=column, ascending=True) 
 
@@ -65,10 +67,11 @@ class DataVisualizer:
             ax.set(title = f'{column} by {group_by}',
                     xlabel = column,
                     ylabel= group_by)
-            plt.savefig('./database/output/graphs/barplot_mat.png')
+            if self.save:
+                plt.savefig('./database/output/graphs/barplot_mat.png')
+
+        if self.show:
             plt.show()
-
-
 
     def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
         """Displays a countplot for every unique value in var, divided by hue if it is specified.
@@ -116,8 +119,6 @@ class DataVisualizer:
                         multiplier += 1
 
                     ax.set_xticks(x + width, data.index)
-                    
-
         else:
             if not hue:
                 if self.library == 'seaborn':
@@ -143,10 +144,14 @@ class DataVisualizer:
 
                     ax.set_yticks(y + height, data.index)
                     ax.set(title=f'Number of apps with for each {var} value')
-
-        plt.savefig('./database/output/graphs/countplot_mat.png')
-        plt.show()
-
+        
+        if self.show:
+            plt.show()
+        if self.save:
+            if self.library == 'seaborn':
+                plt.savefig(f'./database/output/graphs/{var}_countplot_sns.png')
+            else:
+                plt.savefig(f'./database/output/graphs/{var}_countplot_mat.png')
         
 # Creates a scatter plot for two numerical variables in a dataframe.
     def scatter_plot(self, df, col1, col2): 
@@ -162,9 +167,8 @@ class DataVisualizer:
             plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
             plt.xlabel(f'Number of {col1}')
             plt.ylabel(f'Total {col2}')
-            plt.savefig('./database/output/graphs/scatterplot_sns.png')
-            plt.show()
-
+            if self.save:
+                plt.savefig('./database/output/graphs/scatterplot_sns.png')
         else:
             plt.plot(x, y, 'o', color='steelblue')
             m, b = np.polyfit(x, y, 1)
@@ -172,7 +176,10 @@ class DataVisualizer:
             plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
             plt.xlabel(f'Number of {col1}')
             plt.ylabel(f'Total {col2}')
-            plt.savefig('./database/output/graphs/scatterplot_mat.png')
+            if self.save:
+                plt.savefig('./database/output/graphs/scatterplot_mat.png')
+
+        if self.show:
             plt.show()
 
 
@@ -192,8 +199,9 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation="vertical")
                 ax.set(xlabel= by, ylabel= column)
                 ax.legend() 
-                ax.set_title(f"Rating by {by}")   
-                plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')              
+                ax.set_title(f"Rating by {by}")
+                if self.save:   
+                    plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')              
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
                 df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
@@ -202,7 +210,8 @@ class DataVisualizer:
                 ax.set_xticklabels(df_melted.Category.unique(), rotation=65)
                 ax.set_title("Average Rating of free and paid Apps in each Category")
                 ax.legend()
-                plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')
+                if self.save:
+                    plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')
             
         else:   
             if type(by) != list:
@@ -212,8 +221,9 @@ class DataVisualizer:
                 plt.legend() 
                 plt.ylabel("Rating")
                 plt.xticks(rotation= "vertical")
-                plt.title(f"Rating by {by}") 
-                plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')
+                plt.title(f"Rating by {by}")
+                if self.save:
+                    plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')
 
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).head(n)
@@ -227,9 +237,11 @@ class DataVisualizer:
                 plt.xticks(x, df_group.index, rotation= 65)
                 plt.title("Average Rating of free and paid Apps in each Category")
                 plt.legend()
-                plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
+                if self.save:
+                    plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
                 
-        plt.show()
+        if self.show:
+            plt.show()
         
 
 # Calculates the popularity score for each app in a dataframe based on its rating and number
@@ -252,17 +264,21 @@ class DataVisualizer:
             sns.barplot(x= df_popularity["App"], y= df_popularity["Popularity"], color='steelblue')
             ax.set_xticklabels(ax.get_xticklabels(), rotation=25)
             ax.set(xlabel= "Apps", ylabel= f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
-            ax.set_title("Top 10 Apps by Popularity")
-            plt.savefig('./database/output/graphs/popularity_rating_sns.png')
+            ax.set_title(f"Top {n} Apps by Popularity")
+            if self.save:
+                plt.savefig('./database/output/graphs/popularity_rating_sns.png')
             
         else:
             plt.bar(df_popularity["App"], df_popularity["Popularity"])
             plt.xticks(rotation= 25)
             plt.xlabel("Apps")
             plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
-            plt.title("Top 10 Apps by Popularity")
-            plt.savefig('./database/output/graphs/popularity_rating_mat.png')
-        plt.show()
+            plt.title(f"Top {n} Apps by Popularity")
+            if self.save:
+                plt.savefig('./database/output/graphs/popularity_rating_mat.png')
+
+        if self.show:
+            plt.show()
 
 
 # Creates a bar chart for the number of apps in each rating range divided by a categorical 
@@ -284,8 +300,7 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
                 ax.set(xlabel= "Categories", ylabel= "App Count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_category_sns.png')   
-                plt.show()  
+                plt.savefig('./database/output/graphs/rating_counter_category_sns.png')    
             elif "Type" in by:
                 data.columns = ["4-5", "3-4", "2-3", "1-2"]
 
@@ -295,9 +310,7 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
                 ax.set(xlabel= "Categories", ylabel= "App Count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_type_sns.png')   
-                plt.show()  
-            
+                plt.savefig('./database/output/graphs/rating_counter_type_sns.png')          
         else:
             if "Category" in by:
                 data.columns = ["1-2", "2-3", "3-4", "4-5"]
@@ -316,8 +329,8 @@ class DataVisualizer:
                 plt.ylabel("App Count")
                 plt.legend()
                 plt.title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_category_mat.png')   
-                plt.show() 
+                if self.save:
+                    plt.savefig('./database/output/graphs/rating_counter_category_mat.png')   
             elif "Type" in by:
                 data.columns = ["4-5", "3-4", "2-3", "1-2"]
                  
@@ -336,8 +349,11 @@ class DataVisualizer:
                 plt.ylabel("App Count")
                 plt.legend()
                 plt.title(f"Number of Apps in each Rating range devided by {by}")
-                plt.savefig('./database/output/graphs/rating_counter_type_mat.png')   
-                plt.show()  
+                if self.save:
+                    plt.savefig('./database/output/graphs/rating_counter_type_mat.png')
+
+        if self.show:
+            plt.show() 
 
 
 # Creates a line chart for the number of apps updated each year in different categories.
@@ -345,7 +361,7 @@ class DataVisualizer:
 
         df = df[['App', 'Category', 'Last Updated']]
         #1 Selezione categorie da mostrare nel grafico
-        categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
+        categories = ['ENTERTAINMENT', 'BUSINESS', 'FAMILY', 'FINANCE', 'PRODUCTIVITY']
         df_main = df[df['Category'].isin(categories)]
         df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
         #2 group by anno e conteggio numero app per categoria per ogni anno
@@ -369,14 +385,12 @@ class DataVisualizer:
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-            plt.savefig('./database/output/graphs/growth_trend_sns.png')
-        
         else:
             trend.plot(kind='line', figsize=(10,5))
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-            plt.savefig('./database/output/graphs/growth_trend_mat.png')
+        #plt.savefig('./database/output/graphs/growth_trend.png')
         plt.show()
 
 
@@ -389,7 +403,8 @@ class DataVisualizer:
             plt.figure(figsize = (15,6))
             sns.heatmap(std_df, annot=True)
             plt.title('Correlation heatmap')
-            plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
+            if self.save:
+                plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
         else:
             # Create a colormap
             cmap = plt.get_cmap('magma')
@@ -416,8 +431,10 @@ class DataVisualizer:
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
                                 ha="center", va="center", color="white", fontsize=12)
             plt.title('Correlation heatmap')
-            plt.savefig('./database/output/graphs/correlation_heatmap_mat.png')
-        plt.show()
+            if self.save:
+                plt.savefig('./database/output/graphs/correlation_heatmap_mat.png')
+        if self.show:
+            plt.show()
         
 
 # Creates a bar chart for the average sentiment score of apps in each category.
@@ -432,7 +449,8 @@ class DataVisualizer:
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
             ax.set_xticks(x + width, data.index, rotation= "vertical")
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
-            plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
+            if self.save:
+                plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
 
         else:
             data = data.sort_values(ascending= False)
@@ -441,6 +459,8 @@ class DataVisualizer:
             plt.ylabel("Avg Sentiment")
             plt.subplots_adjust(bottom= 0.25)
             plt.title("Average sentiment per Category")
-            plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
+            if self.save:
+                plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
 
-        plt.show()
+        if self.show:
+            plt.show()

@@ -13,7 +13,7 @@ class DataVisualizer:
 
     def pipeline(self, df, df_all):
         if self.library == 'seaborn':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -21,12 +21,12 @@ class DataVisualizer:
             self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
             self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
             self.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
-            self.growth_trend(df)
+            self.growth_trend(df)'''
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
 
         elif self.library == 'matplotlib':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -34,7 +34,7 @@ class DataVisualizer:
             self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
             self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
             self.rating_counter(df, "Rating", "Type") 
-            self.growth_trend(df)
+            self.growth_trend(df)'''
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
 
@@ -387,12 +387,13 @@ class DataVisualizer:
         
         if self.library=='seaborn':
             plt.figure(figsize = (15,6))
-            sns.heatmap(std_df, annot=True)
+            sns.heatmap(std_df, annot=True, cmap="PuBu")
             plt.title('Correlation heatmap')
+            plt.tick_params(axis='y', rotation=0)
             plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
         else:
             # Create a colormap
-            cmap = plt.get_cmap('magma')
+            cmap = plt.get_cmap('crest')
 
             # Plot the matrix
             fig, ax = plt.subplots(figsize=(15, 6))
@@ -403,7 +404,7 @@ class DataVisualizer:
             yticks = np.arange(0.5, len(std_df.columns), 1)
             ax.set_xticks(xticks, minor=False)
             ax.set_yticks(yticks, minor=False)
-            ax.set_xticklabels(std_df.columns, fontsize=15, rotation=65)
+            ax.set_xticklabels(std_df.columns, fontsize=15, rotation=65, ha='left')
             ax.set_yticklabels(std_df.columns, fontsize=15)
 
             # Set colorbar

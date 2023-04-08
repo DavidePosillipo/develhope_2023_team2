@@ -45,7 +45,9 @@ df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative
 di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
 
 # Applies the data visualization pipeline (DataVisualizer)
-dv.pipeline(df, df_all)
+#dv.pipeline(df_all)
 
 # Loads PNG graphs based on library
-di.load_image('png', library='seaborn')
+#di.load_image('png', library='seaborn')
+
+print(df.groupby('Category')['App'].count().sort_values(ascending=False))

@@ -14,7 +14,7 @@ class DataVisualizer:
     def pipeline(self, df):
         sns_vis = DataVisualizer(library="seaborn")
         sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        sns_vis.scatter_plot(df, 'Installs', 'Reviews')
+        '''sns_vis.scatter_plot(df, 'Installs', 'Reviews')
         sns_vis.countplot(df, var='Category', hue='Type')
         sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
         sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
@@ -22,11 +22,11 @@ class DataVisualizer:
         sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         sns_vis.rating_counter(df, "Rating", "Type")                                      #number of Apps in each Type (free, paid) for each Rating range
         sns_vis.growth_trend(df)
-        sns_vis.correlation_heatmap(df)
+        sns_vis.correlation_heatmap(df)'''
 
         plt_vis = DataVisualizer(library="matplotlib")
         plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        plt_vis.scatter_plot(df, 'Installs', 'Reviews')
+        '''plt_vis.scatter_plot(df, 'Installs', 'Reviews')
         plt_vis.countplot(df, var='Category', hue='Type')
         plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
         plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
@@ -34,10 +34,13 @@ class DataVisualizer:
         plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
         plt_vis.rating_counter(df, "Rating", "Type") 
         plt_vis.growth_trend(df)
-        plt_vis.correlation_heatmap(df)
+        plt_vis.correlation_heatmap(df)'''
+
+    def save_png(self, title, xlabel, ylabel, path, bottom=None):
+        pass
 
     def barh_by_grouping(self, df, column, group_by, agg):
-        data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
+        data = df.groupby(by=group_by)[column].agg(agg).reset_index()
         
         fig, ax = plt.subplots(figsize=(15, 6))
 
@@ -48,78 +51,18 @@ class DataVisualizer:
                         x=column,
                         color="b")
             plt.title(f'{column} by {group_by}')
+            plt.savefig('./database/output/graphs/barh_by_grouping_sns.png')
+            plt.show()
 
         else:
-            data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index().sort_values(by=column, ascending=True) # FYI Purtroppo seaborn e matplotlib ordinano i valori in maniera opposta
+            data = df.groupby(by=group_by)[column].agg(agg).reset_index().sort_values(by=column, ascending=True) # FYI Purtroppo seaborn e matplotlib ordinano i valori in maniera opposta
 
             ax.barh(y=group_by, width=column, data=data)
-            
-        ax.set(title = f'{column} by {group_by}',
+            ax.set(title = f'{column} by {group_by}',
                 xlabel = column,
                 ylabel= group_by)
-        plt.show()
-
-class DataVisualizer:
-
-    def __init__(self, library: Literal["seaborn", "matplotlib"],seaborn_theme: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False):
-        self.library = library
-        if seaborn_theme:
-            sns.set_theme(style=seaborn_theme)
-
-    def pipeline(self, df, df_all):
-        sns_vis = DataVisualizer(library="seaborn")
-        sns_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        sns_vis.scatter_plot(df, 'Installs', 'Reviews')
-        sns_vis.countplot(df, var='Category', hue='Type')
-        sns_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-        sns_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        sns_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-        sns_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        sns_vis.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
-        sns_vis.growth_trend(df)
-        sns_vis.correlation_heatmap(df)
-        sns_vis.sent_category_hbar(df_all)
-
-        plt_vis = DataVisualizer(library="matplotlib")
-        plt_vis.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-        plt_vis.scatter_plot(df, 'Installs', 'Reviews')
-        plt_vis.countplot(df, var='Category', hue='Type')
-        plt_vis.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-        plt_vis.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-        plt_vis.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-        plt_vis.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-        plt_vis.rating_counter(df, "Rating", "Type") 
-        plt_vis.growth_trend(df)
-        plt_vis.correlation_heatmap(df)
-        plt_vis.sent_category_hbar(df_all)
-
-
-# Creates a horizontal bar chart for a column in a dataframe grouped by another column 
-# using the specified aggregation function.
-    def barh_by_grouping(self, df, column, group_by, agg):
-        data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index()
-        
-        fig, ax = plt.subplots(figsize=(15, 6))
-
-        if self.library == "seaborn":
-            #FYI Seaborn e matplotlib order opposite ways
-            sns.barplot(data=data.sort_values(by=column, ascending=False), 
-                        y=group_by,
-                        x=column,
-                        color="b")
-            plt.title(f'{column} by {group_by}')
-
-        else:
-            # FYI Seaborn e matplotlib order opposite ways
-            data = df[[group_by, column]].groupby(by=group_by).agg(agg).reset_index().sort_values(by=column, ascending=True) 
-
-            ax.barh(y=group_by, width=column, data=data)
-            
-        ax.set(title = f'{column} by {group_by}',
-                xlabel = column,
-                ylabel= group_by)
-        #plt.savefig('./database/output/graphs/barplot.png')
-        plt.show()
+            plt.savefig('./database/output/graphs/barh_by_grouping_mat.png')
+            plt.show()
 
 
 # Creates a countplot for a categorical variable in a dataframe with or without a hue variable.

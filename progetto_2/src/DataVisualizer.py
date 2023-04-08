@@ -29,17 +29,17 @@ class DataVisualizer:
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
         elif self.library == 'matplotlib':
-            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
             self.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
             self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
             self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-            self.rating_counter(df, "Rating", "Type") 
-            self.growth_trend(df)'''
+            self.rating_counter(df, "Rating", "Type")
+            self.growth_trend(df)
             self.correlation_heatmap(df)
-            #self.sent_category_hbar(df_all)
+            self.sent_category_hbar(df_all)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df.groupby(by=group_by)[column].agg(agg).reset_index()
@@ -208,7 +208,7 @@ class DataVisualizer:
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
                 df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
-                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["blue", "grey"])
+                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["blue", "yellow"])
                 ax.set_ylabel("Rating")
                 ax.set_xticklabels(df_melted.Category.unique(), rotation=90)
                 ax.set_title("Average Rating of free and paid Apps in each Category")
@@ -226,7 +226,7 @@ class DataVisualizer:
                 plt.xticks(rotation= "vertical")
                 plt.title(f"Rating distribution by {by} sorted by highest average")
                 if self.save:
-                    plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')
+                    plt.savefig('./database/output/graphs/Rating_distribution_by_category_mat.png')
 
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).head(n)
@@ -340,7 +340,7 @@ class DataVisualizer:
                     plt.savefig('./database/output/graphs/rating_counter_category_mat.png')   
             elif "Type" in by:
                 data.columns = ["4-5", "3-4", "2-3", "1-2"]
-                 
+                
                 data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
                 x = np.arange(df[by].nunique())*1.75
                 x1 = data["4-5"]
@@ -394,16 +394,17 @@ class DataVisualizer:
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
+            if self.save:
+                plt.savefig('./database/output/graphs/growth_trend_sns.png')
         else:
             trend.plot(kind='line', figsize=(10,5))
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-        
+            if self.save:
+                plt.savefig('./database/output/graphs/growth_trend_mat.png')
         if self.show:
             plt.show()
-        if self.save:
-            plt.savefig('./database/output/graphs/growth_trend.png')
 
 
 # Creates a heatmap for the correlation matrix of a dataframe.
@@ -467,7 +468,7 @@ class DataVisualizer:
             x = np.arange(len(data.index))
             width = 0.35
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
-            ax.set_xticks(x + width, data.index, rotation= "vertical")
+            ax.set_xticks(x + width, data.index)
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
             if self.save:
                 plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
@@ -475,7 +476,8 @@ class DataVisualizer:
         else:
             data = data.sort_values(ascending= False)
             plt.bar(data.index, data.values)
-            plt.xticks(rotation= 35, ha= "right", fontsize= 8)
+            plt.xticks(rotation= 'vertical', fontsize= 10)
+            plt.xlabel(xlabel= "Categories")
             plt.ylabel("Avg Sentiment")
             if self.save:
                 plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')

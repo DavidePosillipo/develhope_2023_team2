@@ -9,9 +9,11 @@ class DataIngestor:
         pass
 
 
-    def load_file(self, path, format):                                              #     Def Load_File:
+    def load_file(self, path):                                              #     Def Load_File:
+         
+        format = path.rsplit(".")[1]
                                                                                     # - Reads a file from the specified path
-        if format == 'pickle':                                                      # - Supports loading files in 'pickle', 'csv', and 'xlsx' formats
+        if format == 'pkl':                                                      # - Supports loading files in 'pickle', 'csv', and 'xlsx' formats
             return pd.read_pickle(path)                                             # - Returns a DataFrame or an error message for unsupported formats
         elif format == 'csv':                     
             return pd.read_csv(path)
@@ -22,9 +24,11 @@ class DataIngestor:
         
         
         
-    def save_file(self, df, path, format):                                          # -     Def Save_File:
+    def save_file(self, df, path):                                          # -     Def Save_File:
+         
+        format = path.rsplit(".")[1] 
                                                                                     # - Saves a DataFrame to the specified path 
-        if format == 'pickle':                                                      # - Supports saving files in 'pickle', 'csv', and 'xlsx' formats
+        if format == 'pkl':                                                      # - Supports saving files in 'pickle', 'csv', and 'xlsx' formats
             return df.to_pickle(path)                                               # - Returns an error message for unsupported formats
         elif format == 'csv':                     
             return df.to_csv(path)
@@ -35,9 +39,11 @@ class DataIngestor:
         
         
         
-    def load_to_list(self, path, col, format):                                      #       Def Load_to_List:
+    def load_to_list(self, path, col):                                      #       Def Load_to_List:
+        
+        format = path.rsplit(".")[1] 
                                                                                     # - Reads a file from the specified path ('pickle', 'csv', and 'xlsx' formats)
-        if format == 'pickle':                                                      # - Extracts a specified column from the DataFrame
+        if format == 'pkl':                                                      # - Extracts a specified column from the DataFrame
             df = pd.read_pickle(path)                                               # - Returns the column values as a list
             return df.iloc[:, col].tolist()                                        # - Returns an error message for unsupported formats
         elif format == 'csv':                                                       

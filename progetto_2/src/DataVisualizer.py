@@ -17,9 +17,9 @@ class DataVisualizer:
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-            self.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-            self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-            self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+            self.grouped_rating(df, "Category", "Rating") '''                                   #average Rating per Category
+            self.popularity_score(df)                                                      #top 10 Apps by Popularity (Rating*Installs)
+            '''self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
             self.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
             self.growth_trend(df)'''
             self.correlation_heatmap(df)
@@ -30,9 +30,9 @@ class DataVisualizer:
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-            self.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
+            self.grouped_rating(df, "Category", "Rating")'''                                 #average Rating per Category
             self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-            self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
+            '''self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
             self.rating_counter(df, "Rating", "Type") 
             self.growth_trend(df)'''
             self.correlation_heatmap(df)
@@ -247,17 +247,18 @@ class DataVisualizer:
             df_popularity = df_copy.sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App", "Popularity"]].head(n)
         
         fig, ax = plt.subplots(figsize= (16, 8))
+        plt.subplots_adjust(bottom= 0.25)
         
         if self.library == "seaborn":
-            sns.barplot(x= df_popularity["App"], y= df_popularity["Popularity"], color='steelblue')
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=25)
+            sns.barplot(x= df_popularity["App"], y= df_popularity["Popularity"], color='steelblue', width=0.5)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right')
             ax.set(xlabel= "Apps", ylabel= f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
             ax.set_title("Top 10 Apps by Popularity")
             plt.savefig('./database/output/graphs/popularity_rating_sns.png')
             
         else:
-            plt.bar(df_popularity["App"], df_popularity["Popularity"])
-            plt.xticks(rotation= 25)
+            plt.bar(df_popularity["App"], df_popularity["Popularity"], width=0.5)
+            plt.xticks(rotation= 45, ha='right')
             plt.xlabel("Apps")
             plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
             plt.title("Top 10 Apps by Popularity")

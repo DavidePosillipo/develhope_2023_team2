@@ -17,7 +17,7 @@ df = di.load_file('database/raw/googleplaystore.csv', 'csv')
 df = dp.pipeline(df) 
 
 # Saves the processed dataframe in a pickle file
-di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')
+di.save_file(df, 'database/output/processed_googleplaystore.csv', 'csv')
 
 # Loads the csv file containing app user reviews
 df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
@@ -48,4 +48,4 @@ di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
 dv.pipeline(df, df_all)
 
 # Loads PNG graphs based on library
-di.load_image('png', library='seaborn')
+#di.load_image('png', library='seaborn')

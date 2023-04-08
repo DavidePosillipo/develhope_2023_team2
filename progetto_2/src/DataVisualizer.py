@@ -54,6 +54,8 @@ class DataVisualizer:
                         x=column,
                         color="b")
             plt.title(f'{column} by {group_by}')
+            plt.savefig('./database/output/graphs/barplot_sns.png')
+            plt.show()
 
         else:
             # FYI Seaborn e matplotlib order opposite ways
@@ -61,11 +63,11 @@ class DataVisualizer:
 
             ax.barh(y=group_by, width=column, data=data)
             
-        ax.set(title = f'{column} by {group_by}',
-                xlabel = column,
-                ylabel= group_by)
-        #plt.savefig('./database/output/graphs/barplot.png')
-        plt.show()
+            ax.set(title = f'{column} by {group_by}',
+                    xlabel = column,
+                    ylabel= group_by)
+            plt.savefig('./database/output/graphs/barplot_mat.png')
+            plt.show()
 
 
 # Creates a countplot for a categorical variable in a dataframe with or without a hue variable.
@@ -76,12 +78,18 @@ class DataVisualizer:
             if not hue:
                 if self.library == 'seaborn':
                     sns.countplot(x=data.items, color='blue', order=df[var].value_counts().index)
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot_sns.png')
                 else:
                     data = df['Category'].value_counts().sort_values(ascending=True)
                     plt.bar(x=data.index, height=data.values, color='blue')
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot_mat.png')
             else:
                 if self.library == 'seaborn':
                     sns.countplot(x=df[var], hue=df[hue], order=df[var].value_counts().index)
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot_sns.png')
                 else:
                     data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
                     data = data.sort_values(by=list(data.columns)[0], ascending=False)
@@ -96,17 +104,25 @@ class DataVisualizer:
                         multiplier += 1
 
                     ax.set_xticks(x + width, data.index)
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot_mat.png')
 
         else:
             if not hue:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], color='blue', order=df[var].value_counts().index)
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot1_sns.png')
                 else:
                     data = df['Category'].value_counts(ascending=True)
                     plt.barh(y=data.index, width=data.values,color='blue')
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot1_mat.png')
             else:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot1_sns.png')
                 else:
                     data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
                     data = data.sort_values(by=list(data.columns)[0])
@@ -121,9 +137,8 @@ class DataVisualizer:
                         multiplier += 1
 
                     ax.set_yticks(y + height, data.index)
-
-        ax.set(title=f'Number of apps with for each {var} value')
-        #plt.savefig('./database/output/graphs/countplot.png')
+                    ax.set(title=f'Number of apps with for each {var} value')
+                    plt.savefig('./database/output/graphs/countplot1_mat.png')
         plt.show()
 
         
@@ -138,17 +153,21 @@ class DataVisualizer:
 
         if self.library == "seaborn":
             sns.regplot(x=x, y=y, data=df)
+            plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
+            plt.xlabel(f'Number of {col1}')
+            plt.ylabel(f'Total {col2}')
+            plt.savefig('./database/output/graphs/scatterplot_sns.png')
+            plt.show()
 
         else:
             plt.plot(x, y, 'o', color='blue')
             m, b = np.polyfit(x, y, 1)
-            plt.plot(x, m*x+b, color='blue')
-        
-        plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
-        plt.xlabel(f'Number of {col1}')
-        plt.ylabel(f'Total {col2}')
-        #plt.savefig('./database/output/graphs/scatterplot.png')
-        plt.show()
+            plt.plot(x, m*x+b, color='blue')      
+            plt.title(f"Pearson's correlation coefficient: {rho(x, y)}")
+            plt.xlabel(f'Number of {col1}')
+            plt.ylabel(f'Total {col2}')
+            plt.savefig('./database/output/graphs/scatterplot_mat.png')
+            plt.show()
 
 
 # Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
@@ -167,7 +186,8 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation="vertical")
                 ax.set(xlabel= by, ylabel= column)
                 ax.legend() 
-                ax.set_title(f"Rating by {by}")                 
+                ax.set_title(f"Rating by {by}")   
+                plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')              
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
                 df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
@@ -176,6 +196,7 @@ class DataVisualizer:
                 ax.set_xticklabels(df_melted.Category.unique(), rotation=65)
                 ax.set_title("Average Rating of free and paid Apps in each Category")
                 ax.legend()
+                plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
             
         else:   
             if type(by) != list:
@@ -186,6 +207,7 @@ class DataVisualizer:
                 plt.ylabel("Rating")
                 plt.xticks(rotation= "vertical")
                 plt.title(f"Rating by {by}") 
+                plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')
 
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).head(n)
@@ -199,6 +221,7 @@ class DataVisualizer:
                 plt.xticks(x, df_group.index, rotation= 65)
                 plt.title("Average Rating of free and paid Apps in each Category")
                 plt.legend()
+                plt.savefig('./database/output/graphs/Rating_distribution_by_category_mat.png')
                 
         plt.show()
         
@@ -340,13 +363,14 @@ class DataVisualizer:
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
+            plt.savefig('./database/output/graphs/growth_trend_sns.png')
         
         else:
             trend.plot(kind='line', figsize=(10,5))
             plt.title('Growth of number of Apps by Category Over Time')
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
-        #plt.savefig('./database/output/graphs/growth_trend.png')
+            plt.savefig('./database/output/graphs/growth_trend_mat.png')
         plt.show()
 
 
@@ -358,6 +382,8 @@ class DataVisualizer:
         if self.library=='seaborn':
             plt.figure(figsize = (15,6))
             sns.heatmap(std_df, annot=True)
+            plt.title('Correlation heatmap')
+            plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
         else:
             # Create a colormap
             cmap = plt.get_cmap('magma')
@@ -383,8 +409,8 @@ class DataVisualizer:
                 for j in range(len(std_df.columns)):
                     text = ax.text(j+0.5, i+0.5, round(std_df.to_numpy()[i, j], 2),
                                 ha="center", va="center", color="white", fontsize=12)
-        plt.title('Correlation heatmap')
-        #plt.savefig('./database/output/graphs/correlation_heatmap.png')
+            plt.title('Correlation heatmap')
+            plt.savefig('./database/output/graphs/correlation_heatmap_mat.png')
         plt.show()
         
 
@@ -400,7 +426,7 @@ class DataVisualizer:
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
             ax.set_xticks(x + width, data.index, rotation= "vertical")
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
-            #plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
+            plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
 
         else:
             data = data.sort_values(ascending= False)
@@ -409,7 +435,7 @@ class DataVisualizer:
             plt.ylabel("Avg Sentiment")
             plt.subplots_adjust(bottom= 0.25)
             plt.title("Average sentiment per Category")
-            #plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
+            plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
 
         plt.show()
         

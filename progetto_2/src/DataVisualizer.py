@@ -194,7 +194,7 @@ class DataVisualizer:
                 ax.set_xticklabels(ax.get_xticklabels(), rotation="vertical")
                 ax.set(xlabel= by, ylabel= column)
                 ax.legend() 
-                ax.set_title(f"Rating by {by}")   
+                ax.set_title(f"Rating distribution by {by} sorted by highest average")   
                 plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')              
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
@@ -214,7 +214,7 @@ class DataVisualizer:
                 plt.legend() 
                 plt.ylabel("Rating")
                 plt.xticks(rotation= "vertical")
-                plt.title(f"Rating by {by}") 
+                plt.title(f"Rating distribution by {by} sorted by highest average") 
                 plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')
 
             else:

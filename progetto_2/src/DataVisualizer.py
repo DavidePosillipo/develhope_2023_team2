@@ -361,7 +361,7 @@ class DataVisualizer:
 
         df = df[['App', 'Category', 'Last Updated']]
         #1 Selezione categorie da mostrare nel grafico
-        categories = ['ENTERTAINMENT', 'BUSINESS', 'FAMILY', 'FINANCE', 'PRODUCTIVITY']
+        categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
         df_main = df[df['Category'].isin(categories)]
         df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
         #2 group by anno e conteggio numero app per categoria per ogni anno
@@ -391,7 +391,8 @@ class DataVisualizer:
             plt.xlabel('Year')
             plt.ylabel('Average Number of Apps')
         #plt.savefig('./database/output/graphs/growth_trend.png')
-        plt.show()
+        if plt.show:
+            plt.show()
 
 
 # Creates a heatmap for the correlation matrix of a dataframe.

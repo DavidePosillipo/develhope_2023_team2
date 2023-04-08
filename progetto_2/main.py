@@ -48,4 +48,4 @@ di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')
 dv.pipeline(df, df_all)
 
 # Loads PNG graphs based on library
-di.load_image('png', library='seaborn')
+#di.load_image('png', library='seaborn')

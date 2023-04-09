@@ -20,7 +20,7 @@ df = dp.pipeline(df)
 di.save_file(df, 'database/output/processed_googleplaystore.csv')
 
 # Loads the csv file containing app user reviews
-df = di.load_file('database/output/processed_googleplaystore.csv')
+#df = di.load_file('database/output/processed_googleplaystore.csv')
 
 # Loads the created file
 df_reviews = di.load_file('database/raw/googleplaystore_user_reviews.csv')

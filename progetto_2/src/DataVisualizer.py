@@ -40,6 +40,8 @@ class DataVisualizer:
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
 
+        
+# Creates a bar chart with an aggregation function on a numerical column groped by a categorical column.
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df.groupby(by=group_by)[column].agg(agg).reset_index()
         
@@ -72,6 +74,8 @@ class DataVisualizer:
         if self.show:
             plt.show()
 
+
+# Shows observation counts in each categorical bin using barplots.
     def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
         """Show the counts of observations in each categorical bin using bars.
         
@@ -152,10 +156,11 @@ class DataVisualizer:
             plt.show()
 
         
-# Creates a scatter plot for two numerical variables in a dataframe.
+# Creates a scatter plot for two numerical columns in a dataframe.
     def scatter_plot(self, df, col1, col2): 
+        print(df[col1].values, "\n", np.asarray(df[col2].values, dtype=int))
         def rho(col1, col2):
-            r = np.corrcoef(col1, col2)
+            r = np.corrcoef(col1, col2)   # np.array(col1), np.asarray(df[col2].values, dtype=int)
             return r[0,1]
 
         fig, ax = plt.subplots()

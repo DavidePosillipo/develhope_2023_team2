@@ -6,7 +6,7 @@ from src.DataAnalyzer import DataAnalyzer
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv = DataVisualizer(library="matplotlib", style='darkgrid', show=True, save=True) 
+dv = DataVisualizer(library="seaborn", style='darkgrid', show=True, save=True) 
 da = DataAnalyzer()  # Any list of words formatted in one column
 
 

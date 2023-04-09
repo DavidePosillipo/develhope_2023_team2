@@ -17,7 +17,7 @@ class DataVisualizer:
 
     def pipeline(self, df, df_all):
         if self.library == 'seaborn':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -27,7 +27,10 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
             self.growth_trend(df)
             self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
+            self.sent_category_hbar(df_all)'''
+            self.violin_plot(df)
+            self.box_plot(df)
+            self.stacked_bar(df)
         elif self.library == 'matplotlib':
             self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
@@ -415,11 +418,10 @@ class DataVisualizer:
         if self.library=='seaborn':
             plt.figure(figsize = (15,6))
             sns.heatmap(std_df, annot=True, cmap="PuBu")
+            #plt.tick_params(axis='y', rotation=0)
             plt.title('Correlation heatmap')
             if self.save:
                 plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
-            plt.tick_params(axis='y', rotation=0)
-            plt.savefig('./database/output/graphs/correlation_heatmap_sns.png')
         else:
             # Set color map
             cmap = plt.get_cmap('crest')
@@ -469,6 +471,7 @@ class DataVisualizer:
             width = 0.35
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
             ax.set_xticks(x + width, data.index)
+            ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
             ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
             if self.save:
                 plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
@@ -484,3 +487,58 @@ class DataVisualizer:
         plt.title("Average sentiment per Category")
         if self.show:
             plt.show()
+
+    def violin_plot(self, df):
+        
+        if self.library == 'seaborn':
+            # Create a violin plot
+            plt.figure(figsize=(60, 20))
+            plt.subplots_adjust(bottom=0.3)
+            sns.violinplot(x='Category', y='Rating', hue='Type', split=True, data=df, inner="stick", linewidth=1)
+
+            # Rotate x-axis labels vertically
+            plt.gca().set_xticklabels(plt.gca().get_xticklabels(), rotation=90)
+
+            # Set the title and axis labels
+            plt.title("Distribution of App Ratings by Category and Type")
+            plt.xlabel("Type")
+            plt.ylabel("Rating")
+            # Plot title
+            plt.title("Violin plot average rating by category by type: Free-Paid")
+            if self.save:
+                plt.savefig('./database/output/graphs/violinplot_avg_rating_by_type_group_category.png')
+            if self.show:
+                plt.show()
+
+    def box_plot(self, df):
+        plt.figure(figsize=(40, 20))
+        plt.subplots_adjust(bottom=0.3)
+        sns.boxplot(x='Category', y='Rating', hue='Type', data=df)
+        plt.xticks(rotation=90)
+        plt.title("Box plot average rating by category by type: Free-Paid")
+        plt.xlabel("Category")
+        plt.ylabel("Rating")
+        plt.show()
+
+    def stacked_bar(self, df):
+        # Create a grouped dataframe by Category and Type
+        grouped = df.groupby(['Category', 'Type'])['Rating'].count().reset_index().sort_values(by='Rating', ascending=False)
+
+        # Create a pivot table to plot the data as a stacked barplot
+        pivot = grouped.pivot(index='Category', columns='Type', values='Rating').fillna(0)
+
+        # Create the stacked barplot
+        fig = plt.figure(figsize=(40, 20))
+        fig.subplots_adjust(bottom=0.20)
+        pivot.plot(kind='bar', stacked=True)
+
+        # Rotate x-axis labels vertically
+        plt.gca().set_xticklabels(plt.gca().get_xticklabels(), rotation=90)
+
+        # Set the title and axis labels
+        plt.title("Number of Apps by Category and Type")
+        plt.xlabel("Category")
+        plt.ylabel("Number of Apps")
+
+        # Show the plot
+        plt.show()

@@ -17,7 +17,7 @@ class DataVisualizer:
 
     def pipeline(self, df, df_all):
         if self.library == 'seaborn':
-            '''self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
+            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
             self.countplot(df, var='Category', hue='Type')
             self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
@@ -27,10 +27,11 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
             self.growth_trend(df)
             self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)'''
+            self.sent_category_hbar(df_all)
             self.violin_plot(df)
             self.box_plot(df)
             self.stacked_bar(df)
+
         elif self.library == 'matplotlib':
             self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
             self.scatter_plot(df, 'Installs', 'Reviews')
@@ -493,6 +494,8 @@ class DataVisualizer:
         if self.show:
             plt.show()
 
+
+# Creates a violin graph that displays the distribution of app ratings based on category and type
     def violin_plot(self, df):
         
         if self.library == 'seaborn':
@@ -515,6 +518,8 @@ class DataVisualizer:
             if self.show:
                 plt.show()
 
+
+# Creates a box plot that displays the distribution of app ratings based on category and type
     def box_plot(self, df):
         plt.figure(figsize=(40, 20))
         plt.subplots_adjust(bottom=0.3)
@@ -525,6 +530,8 @@ class DataVisualizer:
         plt.ylabel("Rating")
         plt.show()
 
+
+# Creates a stacked bar plot that displays the number of apps based on category and type
     def stacked_bar(self, df):
         # Create a grouped dataframe by Category and Type
         grouped = df.groupby(['Category', 'Type'])['Rating'].count().reset_index().sort_values(by='Rating', ascending=False)

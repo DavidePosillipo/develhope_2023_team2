@@ -28,8 +28,8 @@ class DataVisualizer:
             self.growth_trend(df)
             self.correlation_heatmap(df)
             self.sent_category_hbar(df_all)
-            self.violin_plot(df)
-            self.box_plot(df)
+            self.violin_plot(df,x='Category',y='Rating',hue='Type')
+            self.box_plot(df,x='Category',y='Rating',hue='Type')
             self.stacked_bar(df)
 
         elif self.library == 'matplotlib':
@@ -496,7 +496,7 @@ class DataVisualizer:
 
 
 # Creates a violin graph that displays the distribution of app ratings based on category and type
-    def violin_plot(self, df, x='Category', y='Rating', hue='Type'):
+    def violin_plot(self, df, x, y, hue):
         
         if self.library == 'seaborn':
             # Create a violin plot
@@ -520,7 +520,7 @@ class DataVisualizer:
 
 
 # Creates a box plot that displays the distribution of app ratings based on category and type
-    def box_plot(self, df, x='Category', y='Rating' , hue='Type'):
+    def box_plot(self, df, x, y , hue):
         plt.figure(figsize=(40, 20))
         plt.subplots_adjust(bottom=0.3)
         sns.boxplot(x, y, hue, data=df)

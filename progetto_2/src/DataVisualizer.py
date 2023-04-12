@@ -46,7 +46,7 @@ class DataVisualizer:
             self.sent_category_hbar(df_all)
 
         
-# Creates a bar chart with an aggregation function on a numerical column groped by a categorical column.
+# Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
     def barh_by_grouping(self, df, column, group_by, agg):
         data = df.groupby(by=group_by)[column].agg(agg).reset_index()
         
@@ -80,23 +80,23 @@ class DataVisualizer:
             plt.show()
 
 
-# Shows observation counts in each categorical bin using barplots.
-    def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
-        """Show the counts of observations in each categorical bin using bars.
-        
-        Args:
-            df: DataFrame
-                Dataset for plotting
-            var: str
-                Name of a variable to plot
-            hue: str, optional
-                Name of a variable in which splitting the data for each var entry
-                in different bars
-            orientation: str, optional
+# Shows observation counts bar in each categorical bin differentiated by 'hue' parameter.
+'''Show the counts of observations in each categorical bin using bars.
+     Args:
+        df: DataFrame
+            Dataset for plotting
+        var: str
+            Name of a variable to plot
+        hue: str, optional
+            Name of a variable in which splitting the data for each var entry
+            in different bars
+        orientation: str, optional
                 Allows to specify the orientation of the graph. If not given the orientation
                 is decided based on the number of unique values in var.
-        Returns: Display graph.             
-        """
+        Returns: Display graph.'''
+
+    def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
+        
         fig, ax = plt.subplots()
         plt.subplots_adjust(left= 0.3)
 
@@ -496,13 +496,13 @@ class DataVisualizer:
 
 
 # Creates a violin graph that displays the distribution of app ratings based on category and type
-    def violin_plot(self, df):
+    def violin_plot(self, df, x='Category', y='Rating', hue='Type'):
         
         if self.library == 'seaborn':
             # Create a violin plot
             plt.figure(figsize=(60, 20))
             plt.subplots_adjust(bottom=0.3)
-            sns.violinplot(x='Category', y='Rating', hue='Type', split=True, data=df, inner="stick", linewidth=1)
+            sns.violinplot(x, y, hue, split=True, data=df, inner="quartile", linewidth=1)
 
             # Rotate x-axis labels vertically
             plt.gca().set_xticklabels(plt.gca().get_xticklabels(), rotation=90)
@@ -520,14 +520,14 @@ class DataVisualizer:
 
 
 # Creates a box plot that displays the distribution of app ratings based on category and type
-    def box_plot(self, df):
+    def box_plot(self, df, x='Category', y='Rating' , hue='Type'):
         plt.figure(figsize=(40, 20))
         plt.subplots_adjust(bottom=0.3)
-        sns.boxplot(x='Category', y='Rating', hue='Type', data=df)
+        sns.boxplot(x, y, hue, data=df)
         plt.xticks(rotation=90)
         plt.title("Box plot average rating by category by type: Free-Paid")
-        plt.xlabel("Category")
-        plt.ylabel("Rating")
+        plt.xlabel(x)
+        plt.ylabel(y)
         plt.show()
 
 

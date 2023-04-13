@@ -81,18 +81,18 @@ class DataVisualizer:
 
 
 # Shows observation counts bar in each categorical bin differentiated by 'hue' parameter.
-'''Show the counts of observations in each categorical bin using bars.
-     Args:
-        df: DataFrame
-            Dataset for plotting
-        var: str
-            Name of a variable to plot
-        hue: str, optional
-            Name of a variable in which splitting the data for each var entry
-            in different bars
-        orientation: str, optional
-                Allows to specify the orientation of the graph. If not given the orientation
-                is decided based on the number of unique values in var.
+    '''Show the counts of observations in each categorical bin using bars.
+        Args:
+            df: DataFrame
+                Dataset for plotting
+            var: str
+                Name of a variable to plot
+            hue: str, optional
+                Name of a variable in which splitting the data for each var entry
+                in different bars
+            orientation: str, optional
+                    Allows to specify the orientation of the graph. If not given the orientation
+                    is decided based on the number of unique values in var.
         Returns: Display graph.'''
 
     def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):

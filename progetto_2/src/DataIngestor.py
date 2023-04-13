@@ -2,6 +2,7 @@ import pandas as pd
 from PIL import Image
 import os
 from typing import Literal
+import psycopg2
 
 class DataIngestor:
 
@@ -72,3 +73,75 @@ class DataIngestor:
                 img.show()
         else:
             return 'Apologies, but this format has not been implemented yet.'
+
+    def create_db(self, db, user, password, host, path, table, columns):
+        # Connect to the database
+        conn = psycopg2.connect(
+            host=host,
+            database=db,
+            user=user,
+            password=password
+        )
+
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+
+        # Check if the table already exists and drop it if it does
+        cur.execute(f"DROP TABLE IF EXISTS {table}")
+
+        # Use the CREATE TABLE command to create the table
+        create_table_query = f"""CREATE TABLE {table} (
+                                    Index INT,
+                                    App VARCHAR(256),
+                                    Category VARCHAR(256),
+                                    Rating FLOAT(50),
+                                    Reviews INT,
+                                    Size INT,
+                                    Installs INT,
+                                    Type VARCHAR(15),
+                                    Price FLOAT,
+                                    Content_Rating VARCHAR(30),
+                                    Genres VARCHAR(50),
+                                    Last_Updated TIMESTAMP,
+                                    Age_Restriction INT,
+                                    PRIMARY KEY (Index)
+                                );"""
+        cur.execute(create_table_query)
+
+        # Use the COPY command to insert the data from the CSV file into the table
+        with open(path, 'r', encoding='utf-8') as f:
+            next(f)  # Skip the header row
+            cur.copy_from(f, table, sep=',', columns=tuple(columns))
+
+        # Commit the changes to the database
+        conn.commit()
+
+        # Close the cursor and the database connection
+        cur.close()
+        conn.close()
+
+
+    def create_categories_table(self, db, user, password, host):
+        # Connect to the database
+        conn = psycopg2.connect(
+            host=host,
+            database=db,
+            user=user,
+            password=password
+        )
+
+        # Open a cursor to perform database operations
+        cur = conn.cursor()
+
+        # Use the CREATE TABLE command to create the categories table
+        create_categories_table_query = "CREATE TABLE categories (" \
+                                        "Category VARCHAR(256) PRIMARY KEY);"
+        cur.execute(create_categories_table_query)
+
+        # Commit the changes to the database
+        conn.commit()
+
+        # Close the cursor and the database connection
+        cur.close()
+        conn.close()
+

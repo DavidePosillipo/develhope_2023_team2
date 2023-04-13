@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS googleplaystore_processed;
+CREATE TABLE googleplaystore_processed(
+	App VARCHAR(256),
+	Category VARCHAR(256),
+	Rating VARCHAR(50),
+	Reviews VARCHAR(50),
+	Size VARCHAR(30),
+	Installs VARCHAR(15),
+	Type VARCHAR(15),
+	Price VARCHAR(15),
+	Content_Rating VARCHAR(30),
+	Genres VARCHAR(50),
+	Last_Updated VARCHAR(50),
+	Current_Ver VARCHAR(50),
+	Android_Ver VARCHAR(50),
+	Extra VARCHAR(50)
+);

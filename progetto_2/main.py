@@ -2,6 +2,7 @@ from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
 from src.DataVisualizer import DataVisualizer
 from src.DataAnalyzer import DataAnalyzer
+from src.DataIngestor import DataIngestor
 
 
 di = DataIngestor()
@@ -10,7 +11,7 @@ dv = DataVisualizer(library="seaborn", style='darkgrid', show=True, save=True)
 da = DataAnalyzer()  # Any list of words formatted in one column
 
 
-# Uploads csv file containing data about Google Play Store apps
+'''# Uploads csv file containing data about Google Play Store apps
 df = di.load_file('database/raw/googleplaystore.csv')
 
 # Applies a data cleaning pipeline to the dataframe (DataPreprocessor)
@@ -46,7 +47,25 @@ di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')
 
 # Applies the data visualization pipeline (DataVisualizer)
 df_all = di.load_file('database/output/googleplaystore_sentiment.pkl')
-dv.pipeline(df, df_all)
+dv.pipeline(df, df_all)'''
 
 # Loads PNG graphs based on library
 #di.load_image('png', library='seaborn')
+
+db = "progetto_team2"
+user = "postgres"
+password = "c"
+host = "localhost"
+path = "./database/output/processed_googleplaystore.csv"
+table = "googleplaystore_processed"
+columns = ['Index', 'App', 'Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content_Rating', 'Genres', 'Last_Updated', 'Age_Restriction']
+primary_key = "Index"
+#foreign_key = "Category"
+
+di.create_db(db = "progetto_team2", 
+            user = "postgres", 
+            password = "c", 
+            host = "localhost", 
+            path = "./database/output/processed_googleplaystore.csv", 
+            table= "googleplaystore_processed", 
+            columns=['Index', 'App', 'Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content_Rating', 'Genres', 'Last_Updated', 'Age_Restriction'])

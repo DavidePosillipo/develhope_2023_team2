@@ -52,16 +52,6 @@ dv.pipeline(df, df_all)'''
 # Loads PNG graphs based on library
 #di.load_image('png', library='seaborn')
 
-db = "progetto_team2"
-user = "postgres"
-password = "c"
-host = "localhost"
-path = "./database/output/processed_googleplaystore.csv"
-table = "googleplaystore_processed"
-columns = ['Index', 'App', 'Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content_Rating', 'Genres', 'Last_Updated', 'Age_Restriction']
-primary_key = "Index"
-#foreign_key = "Category"
-
 di.create_db(db = "progetto_team2", 
             user = "postgres", 
             password = "c", 

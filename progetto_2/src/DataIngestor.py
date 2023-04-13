@@ -3,6 +3,7 @@ from PIL import Image
 import os
 from typing import Literal
 import psycopg2
+import csv
 
 class DataIngestor:
 
@@ -75,6 +76,30 @@ class DataIngestor:
             return 'Apologies, but this format has not been implemented yet.'
 
     def create_db(self, db, user, password, host, path, table, columns):
+        # Open the input and output CSV files
+        with open(path, 'r') as in_file, open('output.csv', 'w', newline='') as out_file:
+            # Create a CSV reader and writer
+            reader = csv.reader(in_file)
+            writer = csv.writer(out_file)
+
+            # Read the header row
+            header_row = next(reader)
+
+            # Add the Index column to the header row
+            header_row.insert(0, 'Index')
+
+            # Write the updated header row to the output file
+            writer.writerow(header_row)
+
+            # Write the remaining rows to the output file
+            index = 1
+            for row in reader:
+                # Add the Index value to the beginning of each row
+                row.insert(0, index)
+                index += 1
+
+                # Write the updated row to the output file
+                writer.writerow(row)
         # Connect to the database
         conn = psycopg2.connect(
             host=host,
@@ -108,10 +133,14 @@ class DataIngestor:
                                 );"""
         cur.execute(create_table_query)
 
-        # Use the COPY command to insert the data from the CSV file into the table
+         # Use the COPY command to insert the data from the CSV file into the table
         with open(path, 'r', encoding='utf-8') as f:
-            next(f)  # Skip the header row
-            cur.copy_from(f, table, sep=',', columns=tuple(columns))
+            reader = csv.reader(f)
+            next(reader)  # Skip the header row
+            for row in reader:
+                cur.execute(f"INSERT INTO {table} ({', '.join(columns[1:])}) VALUES ({', '.join(['%s'] * len(columns[1:]) )})", row[1:])
+        # Try except e printare la riga che non riesce a decodificare
+        #Prova con la libreria Pandas a leggere il file
 
         # Commit the changes to the database
         conn.commit()

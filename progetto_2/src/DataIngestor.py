@@ -140,7 +140,7 @@ class DataIngestor:
             for row in reader:
                 cur.execute(f"INSERT INTO {table} ({', '.join(columns[1:])}) VALUES ({', '.join(['%s'] * len(columns[1:]) )})", row[1:])
         # Try except e printare la riga che non riesce a decodificare
-        #Prova con la libreria Pandas a leggere il file
+        # Prova con la libreria Pandas a leggere il file
 
         # Commit the changes to the database
         conn.commit()

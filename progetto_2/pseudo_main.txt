@@ -1,0 +1,48 @@
+Pseudo Codice Main
+
+Importiamo dalla cartella src(source) le classi programmate dal team:
+-DataIngestor
+-DataPreprocessor
+-DataVisualizer
+-DataAnalyzer
+
+Inizializziamo le classe importate definendole come segue:
+di = DataIngestor
+dp = DataPreprocessor
+dv = DataVisualizer("seaborn") # Compatibile con matplotlib e seaborn, bisogna specificare
+da = DataAnalyzer
+
+Lavoriamo su dei file di impunt usando queste classi:
+1) Carichiamo il file csv contenente i dati relativi al Google Play Store
+df = di.load_file('database/raw/googleplaystore.csv', 'csv')
+2) Applichiamo il dp DataPreprocessor al df DataFrame
+df = dp.pipeline(df) 
+3) Applichiamo la classe DataVisualizer al df di output della classe Preprocessor usata in precedenza
+dv.pipeline(df, df_all)
+
+#DEPRECATED
+#''3Salviamo il file di output del preprocessor come file pickle
+#di.save_file(df, 'database/output/processed_googleplaystore.pkl', 'pickle')'''
+#DEPRECATED
+#1Carichiamo il file csv contenente le review del Google Play Store
+#df= di.load_file('database/output/processed_googleplaystore.csv', 'csv')
+
+1) Carichiamo il file csv contenente le review del Google Play Store
+df_reviews = di.load_file('database/raw/googleplaystore_user_reviews.csv', 'csv')
+2) Pulizia del file csv review csv con la classe DataPreprocessor
+df_reviews = dp.pipeline_reviews(df_reviews) 
+3) Salviamo il file pulito come Pickle (.pkl)
+di.save_file(df_reviews, 'database/output/processed_reviews.pkl', 'pickle')
+4) Carichiamo il file pkl ridefinendo la variabile df_reviews
+df_reviews = di.load_file('database/output/processed_reviews.pkl', 'pickle')
+
+Eseguiamo la Sentiment Analysis 
+0) Carichiamo le parole di riferimento
+negative_words = di.load_to_list('database/raw/n.xlsx', col=0, format='xlsx')
+positive_words = di.load_to_list('database/raw/p.xlsx', col=0, format='xlsx')
+1)Applichiamo la classe DataAnalyzer al file relativo alle review usando i riferimenti appena caricati
+df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
+2)Salviamo il file di output df_all (che contiene il valore della sentiment per ogni app) del DataAnalyzer come googleplaystore_sentiment.pkl (Pickle) 
+di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl', 'pickle')
+
+

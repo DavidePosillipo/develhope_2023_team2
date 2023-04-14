@@ -9,17 +9,14 @@ class DatabaseCreator:
     def create_table(self, table_name, columns, primary_key=None):
         with self.engine.connect() as conn:
             conn.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ({','.join(columns)})")
-            # Add primary key constraint
-            if primary_key:
-                conn.execute(f"ALTER TABLE {table_name} ADD PRIMARY KEY ({primary_key})")
+        # Add primary key constraint
+        if primary_key:
+            conn.execute(f"ALTER TABLE {table_name} ADD PRIMARY KEY ({primary_key})")
 
     def copy_csv_to_table(self, csv_path, table_name):
-        try:
-            df = pd.read_csv(csv_path)
-            with self.engine.connect() as conn:
-                df.to_sql(table_name, con=conn, if_exists='append', index=False)
-        except Exception as e:
-            print(f"Error copying CSV to table: {e}")
+        df = pd.read_csv(csv_path)
+        with self.engine.connect() as conn:
+            df.to_sql(table_name, con=conn, if_exists='append', index=False)
     
     def add_foreign_key(self, table_name, column_name, foreign_table_name, foreign_column_name):
         with self.engine.connect() as conn:
@@ -42,7 +39,7 @@ columns = ['Index INT',
     'Genres VARCHAR(50)',
     'Last_Updated TIMESTAMP',
     'Age_Restriction INT']
-primary_key = 'App'
+primary_key = 'Index'
 
 db_creator = DatabaseCreator('postgresql', 'postgres', 'c', 'localhost', '5432', 'progetto_team2')
 db_creator.create_table(table_name, columns)

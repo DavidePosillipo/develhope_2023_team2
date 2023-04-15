@@ -52,6 +52,26 @@ class db_handler():
                 self.cur.close()
                 self.conn.close()
 
+    def test_query(self, table_name):
+        try:
+            # Connect to the PostgreSQL server
+            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            cur = conn.cursor()
+            # Execute a SELECT query on the table
+            cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
+            rows = cur.fetchall()
+            # Print the rows returned by the query
+            for row in rows:
+                print(row)
+        except psycopg2.Error as e:
+            print("Error executing SELECT query:", e)
+        finally:
+            if conn is not None:
+                cur.close()
+                conn.close()
+
+
 db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
 
 table_name = 'googleplaystore_processed'
@@ -66,9 +86,10 @@ columns = ['Index INT',
     'Price FLOAT',
     'Content_Rating VARCHAR(30)',
     'Genres VARCHAR(50)',
-    'Last_Updated TIMESTAMP',
+    'Last_Updated DATE',
     'Age_Restriction INT']
 primary_key = 'Index'
 csv_path = './database/output/processed_googleplaystore.csv'
 
 db.create_table_and_import_data(table_name, columns, primary_key, csv_path)
+db.test_query(table_name)

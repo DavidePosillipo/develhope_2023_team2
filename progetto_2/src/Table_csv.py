@@ -46,27 +46,6 @@ class db_handler():
             if self.conn is not None:
                 self.cur.close()
                 self.conn.close()
-    
-    
-    def insert_values_main(self, table_name, csv_path):
-        try:
-            # Connect to the PostgreSQL server
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-            # Open a cursor to perform database operations
-            self.cur = self.conn.cursor()
-            # Import data from CSV to table
-            with open(csv_path, 'r', encoding='utf-8-sig') as f:
-                next(f)
-                self.cur.copy_from(f, table_name, sep=',')
-            # Commit the transaction
-            self.conn.commit()
-            print("Table created and data imported successfully")
-        except psycopg2.Error as e:
-            print("Error creating table or importing data:", e)
-        finally:
-            if self.conn is not None:
-                self.cur.close()
-                self.conn.close()
 
     def insert_values_categories(self, path, query):
         try:

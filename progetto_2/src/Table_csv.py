@@ -143,28 +143,7 @@ class db_handler():
                 conn.close()
 
 db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
-
-table_query = """
-    CREATE TABLE processed_googleplaystore (
-    "App ID" INT PRIMARY KEY,
-    "App Name" VARCHAR(256),
-    Category VARCHAR(50),
-    Rating VARCHAR(10),
-    Reviews VARCHAR(50),
-    Size VARCHAR(50),
-    Installs VARCHAR(50),
-    Type VARCHAR(10),
-    Price VARCHAR(50),
-    "Content Rating" VARCHAR(50),
-    Genres VARCHAR(50),
-    "Last Updated" VARCHAR(50),
-    "Age Restriction" VARCHAR(50)
-    )
-"""
-db.create_table(table_query)
-db.insert_values_main('processed_googleplaystore', './database/output/processed_googleplaystore.csv')
-db.test_query('processed_googleplaystore', True)
-
+# CATEGORY TABLE
 table_query = """
     CREATE TABLE categories (
         "Category ID" SERIAL PRIMARY KEY,
@@ -181,26 +160,25 @@ insert_query = """
 """
 db.insert_values_categories('./database/output/processed_googleplaystore.csv', insert_query)
 db.test_query('categories')
-
+# APP TABLE
 table_query = """
     CREATE TABLE Apps (
-        "App ID" INT REFERENCES processed_googleplaystore("App ID"),
-        "App Name" VARCHAR(256),
-        "Category ID" INT REFERENCES categories("Category ID"),
-        Rating FLOAT(50),
-        Reviews INT,
-        Size INT,
-        Installs INT,
-        Type VARCHAR(15),
-        Price FLOAT,
-        "Content Rating" VARCHAR(30),
-        Genres VARCHAR(50),
-        "Last Updated" DATE,
-        "Age Restriction" INT
+    "App ID" INT PRIMARY KEY,
+    "App Name" VARCHAR(256),
+    "Category ID" INT REFERENCES categories("Category ID"),
+    Rating VARCHAR(10),
+    Reviews VARCHAR(50),
+    Size VARCHAR(50),
+    Installs VARCHAR(50),
+    Type VARCHAR(10),
+    Price VARCHAR(50),
+    "Content Rating" VARCHAR(50),
+    Genres VARCHAR(50),
+    "Last Updated" VARCHAR(50),
+    "Age Restriction" VARCHAR(50)
     )
 """
 db.create_table(table_query)
-
 query = """INSERT INTO Apps (
                 "App ID", "App Name", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
                 "Content Rating", Genres, "Last Updated", "Age Restriction") 

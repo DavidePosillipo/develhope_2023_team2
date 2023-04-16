@@ -103,8 +103,8 @@ class db_handler():
                 next(reader)  # skip the header row
                 for row in reader:
                     App_ID, app_name, category, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction = row
-                    App_id_query = "SELECT App_ID FROM processed_googleplaystore WHERE Name = %s"
-                    category_id_query = "SELECT Category_ID FROM categories WHERE Name = %s"
+                    app_id_query = """SELECT "App ID" FROM processed_googleplaystore WHERE "App Name" = %s"""
+                    category_id_query = """SELECT "Category ID" FROM categories WHERE Name = %s"""
                     self.cur.execute(category_id_query, (category,))
                     category_id = self.cur.fetchone()[0]
                     app_values = (App_ID, app_name, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction)
@@ -146,8 +146,8 @@ db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
 
 table_query = """
     CREATE TABLE processed_googleplaystore (
-    App_ID INT PRIMARY KEY,
-    App VARCHAR(256),
+    "App ID" INT PRIMARY KEY,
+    "App Name" VARCHAR(256),
     Category VARCHAR(50),
     Rating VARCHAR(10),
     Reviews VARCHAR(50),
@@ -167,7 +167,7 @@ db.test_query('processed_googleplaystore', True)
 
 table_query = """
     CREATE TABLE categories (
-        Category_ID SERIAL PRIMARY KEY,
+        "Category ID" SERIAL PRIMARY KEY,
         Name VARCHAR(256) NOT NULL
     )
 """
@@ -184,24 +184,27 @@ db.test_query('categories')
 
 table_query = """
     CREATE TABLE Apps (
-        App_ID INT REFERENCES processed_googleplaystore(App_ID),
-        AppName VARCHAR(256),
-        Category_ID INT REFERENCES categories(Category_ID),
+        "App ID" INT REFERENCES processed_googleplaystore("App ID"),
+        "App Name" VARCHAR(256),
+        "Category ID" INT REFERENCES categories("Category ID"),
         Rating FLOAT(50),
         Reviews INT,
         Size INT,
         Installs INT,
         Type VARCHAR(15),
         Price FLOAT,
-        Content_Rating VARCHAR(30),
+        "Content Rating" VARCHAR(30),
         Genres VARCHAR(50),
-        Last_Updated DATE,
-        Age_Restriction INT
+        "Last Updated" DATE,
+        "Age Restriction" INT
     )
 """
 db.create_table(table_query)
 
-query = "INSERT INTO apps (Index, Name, Category_ID, Rating, Reviews, Size, Installs, Type, Price, ContentRating, Genres, LastUpdated, AgeRestriction) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+query = """INSERT INTO Apps (
+                "App ID", "App Name", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
+                "Content Rating", Genres, "Last Updated", "Age Restriction") 
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 path = './database/output/processed_googleplaystore.csv'
 db.insert_values_apps(path, query)
 db.test_query('Apps', True)

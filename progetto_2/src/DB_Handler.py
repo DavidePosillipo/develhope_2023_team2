@@ -1,4 +1,5 @@
 import psycopg2
+import pandas as pd
 
 class db_handler():
     def __init__(self, database, user, password, host, database_name):
@@ -71,8 +72,27 @@ class db_handler():
                 cur.close()
                 conn.close()
 
+    def read_table(self, table_name):
+        try:
+            # Connect to the PostgreSQL server
+            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            cur = conn.cursor()
+            # Execute a SELECT query on the table
+            cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
+            data = cur.fetchall()
+        except psycopg2.Error as e:
+            print("Error executing SELECT query:", e)
 
-db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
+        # Create dataframe
+        cols = []
+        for elt in cur.description:
+            cols.append(elt[0])
+
+        return pd.DataFrame(data=data, columns=cols)
+    
+
+db = db_handler(database = 'postgres', user = 'postgres', password='postgres', host='localhost', database_name = 'googleplaystore')
 
 table_name = 'googleplaystore_processed'
 columns = ['Index INT', 
@@ -92,4 +112,5 @@ primary_key = 'Index'
 csv_path = './database/output/processed_googleplaystore.csv'
 
 db.create_table_and_import_data(table_name, columns, primary_key, csv_path)
-db.test_query(table_name)
+df = db.read_table(table_name)
+df.head()

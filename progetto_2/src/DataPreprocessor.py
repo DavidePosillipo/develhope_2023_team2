@@ -29,6 +29,8 @@ class DataPreprocessor:
         self.transform_age(df, 'Content Rating')
         self.rename_categories(df)
         self.comma_replacer(df, 'App')
+        self.quotatione_marks_replacer(df, 'App')
+        self.drop_duplicates(df, 'App')
         return df
     
     
@@ -163,4 +165,13 @@ class DataPreprocessor:
 
     def comma_replacer(self, df, col):                                                                          #       Def Comma_Replacer:
                                                                                                                 # - Replace comma with empty string
-        df[col] = df[col].str.replace(',', '')                                                                  
+        df[col] = df[col].str.replace(',', '')
+
+    def quotatione_marks_replacer(self, df, col):                                                               #       Def quotatione_marks_replacer:
+                                                                                                                # - Replace quotation marks with empty string
+        df[col] = df[col].str.replace("'", '')
+        df[col] = df[col].str.replace('"', '')   
+
+    def drop_duplicates(self, df, col):
+
+        df = df.drop_duplicates(subset=col, keep='first')                                                    

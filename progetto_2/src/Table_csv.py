@@ -69,6 +69,23 @@ class db_handler():
             if self.conn is not None:
                 self.cur.close()
                 self.conn.close()
+    
+    def app(self, path, query):
+        # Connect to the PostgreSQL server
+        self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+        # Open a cursor to perform database operations
+        self.cur = self.conn.cursor()
+        with open(path, 'r', encoding='utf-8-sig') as f:
+            reader = csv.reader(f)
+            next(reader)  # skip the header row
+            num_rows = 0
+            for row in reader:
+                app_name = row[1]
+                self.cur.execute(query, (app_name, app_name))
+                num_rows += 1
+            self.conn.commit()
+        print(f"{num_rows} rows inserted into the database.")
+
 
     def insert_values_apps(self, path, query):
         try:
@@ -81,12 +98,14 @@ class db_handler():
                 reader = csv.reader(f)
                 next(reader)  # skip the header row
                 for row in reader:
-                    App_ID, app_name, category, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction = row
-                    app_id_query = """SELECT "App ID" FROM processed_googleplaystore WHERE "App Name" = %s"""
+                    Index, app_id, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction = row
+                    app_id_query = """SELECT "id" FROM Apps WHERE "name" = %s"""
                     category_id_query = """SELECT "Category ID" FROM categories WHERE Name = %s"""
-                    self.cur.execute(category_id_query, (category,))
+                    self.cur.execute(category_id_query, (category_id,))
                     category_id = self.cur.fetchone()[0]
-                    app_values = (App_ID, app_name, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction)
+                    self.cur.execute(app_id_query, (app_id,))
+                    app_id = self.cur.fetchone()[0]
+                    app_values = (Index, app_id, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction)
                     self.cur.execute(query, app_values)
             # Commit the transaction
             self.conn.commit()
@@ -122,6 +141,7 @@ class db_handler():
                 conn.close()
 
 db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
+
 # CATEGORY TABLE
 table_query = """
     CREATE TABLE categories (
@@ -139,11 +159,35 @@ insert_query = """
 """
 db.insert_values_categories('./database/output/processed_googleplaystore.csv', insert_query)
 db.test_query('categories')
+
+
 # APP TABLE
+# Define the table creation query
 table_query = """
-    CREATE TABLE Apps (
-    "App ID" INT PRIMARY KEY,
-    "App Name" VARCHAR(256),
+    CREATE TABLE apps (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(256) NOT NULL
+    )
+"""
+# Create the table
+db.create_table(table_query)
+# Define the query for inserting data into the table
+insert_query = """
+    INSERT INTO apps (name)
+    SELECT %s
+    WHERE NOT EXISTS (
+        SELECT 1 FROM apps WHERE name = %s
+    )
+"""
+# Insert data from CSV file into the table
+db.app('./database/output/processed_googleplaystore.csv', insert_query)
+db.test_query('apps', True)
+
+# APPS TABLE
+table_query = """
+    CREATE TABLE Main (
+    "Index" INT,
+    "App ID" INT REFERENCES apps("id"),
     "Category ID" INT REFERENCES categories("Category ID"),
     Rating VARCHAR(10),
     Reviews VARCHAR(50),
@@ -158,10 +202,12 @@ table_query = """
     )
 """
 db.create_table(table_query)
-query = """INSERT INTO Apps (
-                "App ID", "App Name", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
+query = """INSERT INTO Main (
+                "Index", "App ID", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
                 "Content Rating", Genres, "Last Updated", "Age Restriction") 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 path = './database/output/processed_googleplaystore.csv'
 db.insert_values_apps(path, query)
-db.test_query('Apps', True)
+db.test_query('Main', True)
+
+#REVIEWS TABLE

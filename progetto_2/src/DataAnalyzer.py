@@ -32,7 +32,12 @@ class DataAnalyzer():
         df_reviews["sentiment score"] = pd.Series(score_list)
         
         df_sentiment = df_reviews.groupby("App")["sentiment score"].mean()
-   
-        df_all = df.merge(df_sentiment, on= "App")
+        df_sentiment = df_sentiment.rename_axis('app') ### CORREZIONE HARD CODED --> BISOGNA IMPLEMENTARE UN METODO CHE RENDA TUTTI I NOMI DELLE COLONNE MINUSCOLI
+
+
+        print(df.head(5))
+        print(df_sentiment.head(5))
+        
+        df_all = df.merge(df_sentiment, on= "app")
         
         return df_reviews, df_sentiment, df_all

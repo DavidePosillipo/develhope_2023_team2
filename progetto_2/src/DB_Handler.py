@@ -1,7 +1,7 @@
 import psycopg2
 import pandas as pd
 
-class db_handler():
+class DB_Handler():
     def __init__(self, database, user, password, host, database_name):
         self.database = database
         self.user = user
@@ -32,26 +32,26 @@ class db_handler():
     def create_table_and_import_data(self, table_name, columns, primary_key, csv_path):
         try:
             # Connect to the PostgreSQL server
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
             # Open a cursor to perform database operations
-            self.cur = self.conn.cursor()
+            cur = conn.cursor()
             # Drop the table if it already exists
-            self.cur.execute(f"DROP TABLE IF EXISTS {table_name};")
+            cur.execute(f"DROP TABLE IF EXISTS {table_name};")
             # Create the table
-            self.cur.execute(f"CREATE TABLE {table_name} ({', '.join(columns)}, PRIMARY KEY ({primary_key}));")
+            cur.execute(f"CREATE TABLE {table_name} ({', '.join(columns)}, PRIMARY KEY ({primary_key}));")
             # Import data from CSV to table
             with open(csv_path, 'r', encoding='utf-8-sig') as f:
                 next(f)
-                self.cur.copy_from(f, table_name, sep=',')
+                cur.copy_from(f, table_name, sep=',')
             # Commit the transaction
-            self.conn.commit()
+            conn.commit()
             print("Table created and data imported successfully")
         except psycopg2.Error as e:
             print("Error creating table or importing data:", e)
         finally:
-            if self.conn is not None:
-                self.cur.close()
-                self.conn.close()
+            if conn is not None:
+                cur.close()
+                conn.close()
 
     def test_query(self, table_name):
         try:
@@ -72,26 +72,35 @@ class db_handler():
                 cur.close()
                 conn.close()
 
-    def read_table(self, table_name):
+    def import_table(self, table_name):
         try:
-            # Connect to the PostgreSQL server
             conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-            # Open a cursor to perform database operations
             cur = conn.cursor()
-            # Execute a SELECT query on the table
             cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
             data = cur.fetchall()
         except psycopg2.Error as e:
-            print("Error executing SELECT query:", e)
+            print("Error importing table:", e)
 
-        # Create dataframe
         cols = []
         for elt in cur.description:
             cols.append(elt[0])
 
         return pd.DataFrame(data=data, columns=cols)
     
+    def save_on_cloud(self):
+        local_conn = psycopg2.connect(database = self.database, user = self.user, password = self.password)
+        cloud_conn = psycopg2.connect(host='rogue.db.elephantsql.com', database = 'nmpmetdq', user = 'nmpmetdq', password = 'y1CeiiPavj4mxXMlrrt8mH_A0kb0tMeV')
 
+        local_cur = local_conn.cursor()
+        cloud_cur = cloud_conn.cursor()
+
+        local_cur.close()
+        cloud_conn.close()
+
+        cloud_cur.close()
+        local_conn.close()
+
+'''
 db = db_handler(database = 'postgres', user = 'postgres', password='postgres', host='localhost', database_name = 'googleplaystore')
 
 table_name = 'googleplaystore_processed'
@@ -110,7 +119,7 @@ columns = ['Index INT',
     'Age_Restriction INT']
 primary_key = 'Index'
 csv_path = './database/output/processed_googleplaystore.csv'
-
 db.create_table_and_import_data(table_name, columns, primary_key, csv_path)
 df = db.read_table(table_name)
 df.head()
+'''

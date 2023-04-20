@@ -1,7 +1,8 @@
 import psycopg2
 import csv
+import pandas as pd
 
-class db_handler():
+class DB_Handler():
     def __init__(self, database, user, password, host, database_name):
         self.database = database
         self.user = user
@@ -29,12 +30,14 @@ class db_handler():
                 self.cur.close()
                 self.conn.close()
 
-    def create_table(self, query):
+    def create_table(self, query, table_name):
         try:
             # Connect to the PostgreSQL server and create a new database
             self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
             # Open a cursor to perform database operations
             self.cur = self.conn.cursor()
+            # Drop the database if it already exists
+            self.cur.execute(f"DROP TABLE IF EXISTS {table_name};")
             # Execute the query to create the table
             self.cur.execute(query)
             # Commit the transaction
@@ -71,20 +74,28 @@ class db_handler():
                 self.conn.close()
     
     def app(self, path, query):
-        # Connect to the PostgreSQL server
-        self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-        # Open a cursor to perform database operations
-        self.cur = self.conn.cursor()
-        with open(path, 'r', encoding='utf-8-sig') as f:
-            reader = csv.reader(f)
-            next(reader)  # skip the header row
-            num_rows = 0
-            for row in reader:
-                app_name = row[1]
-                self.cur.execute(query, (app_name, app_name))
-                num_rows += 1
-            self.conn.commit()
-        print(f"{num_rows} rows inserted into the database.")
+        try:
+            # Connect to the PostgreSQL server
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            self.cur = self.conn.cursor()
+            with open(path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.reader(f)
+                next(reader)  # skip the header row
+                num_rows = 0
+                for row in reader:
+                    app_name = row[1]
+                    self.cur.execute(query, (app_name, app_name))
+                    num_rows += 1
+                # Commit the transaction
+                self.conn.commit()
+                print("Data inserted successfully")
+        except psycopg2.Error as e:
+            print("Error inserting data:", e)
+        finally:
+            if self.conn is not None:
+                self.cur.close()
+                self.conn.close()
 
 
     def insert_values_apps(self, path, query):
@@ -99,7 +110,7 @@ class db_handler():
                 next(reader)  # skip the header row
                 for row in reader:
                     Index, app_id, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction = row
-                    app_id_query = """SELECT "id" FROM Apps WHERE "name" = %s"""
+                    app_id_query = """SELECT "App ID" FROM Apps WHERE "name" = %s"""
                     category_id_query = """SELECT "Category ID" FROM categories WHERE Name = %s"""
                     self.cur.execute(category_id_query, (category_id,))
                     category_id = self.cur.fetchone()[0]
@@ -117,6 +128,50 @@ class db_handler():
                 self.cur.close()
                 self.conn.close()
 
+    def insert_values_reviews(self, path, query):
+        try:
+            # Connect to the PostgreSQL server
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            self.cur = self.conn.cursor()
+            with open(path, 'r', encoding='utf-8-sig') as f:
+                reader = csv.reader(f)
+                next(reader)  # skip the header row
+                for row in reader:
+                    app, review = row
+                    app_id_query = """SELECT "App ID" FROM apps WHERE "name" = %s"""
+                    self.cur.execute(app_id_query, (app,))
+                    app_id = self.cur.fetchone()[0]
+                    app_values = (app_id, review)
+                    self.cur.execute(query, app_values)
+            # Commit the transaction
+            self.conn.commit()
+            print("Data inserted successfully")
+        except psycopg2.Error as e:
+            print("Error inserting data:", e)
+        finally:
+            if self.conn is not None:
+                self.cur.close()
+                self.conn.close()
+
+    def read_table(self, table_name):
+        try:
+            # Connect to the PostgreSQL server
+            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            cur = conn.cursor()
+            # Execute a SELECT query on the table
+            cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
+            data = cur.fetchall()
+        except psycopg2.Error as e:
+            print("Error executing SELECT query:", e)
+
+        # Create dataframe
+        cols = []
+        for elt in cur.description:
+            cols.append(elt[0])
+
+        return pd.DataFrame(data=data, columns=cols)
     
     def test_query(self, table_name, limit=False):
         try:
@@ -140,7 +195,7 @@ class db_handler():
                 cur.close()
                 conn.close()
 
-db = db_handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
+db = DB_Handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
 
 # CATEGORY TABLE
 table_query = """
@@ -149,7 +204,7 @@ table_query = """
         Name VARCHAR(256) NOT NULL
     )
 """
-db.create_table(table_query)
+db.create_table(table_query, 'categories')
 insert_query = """
     INSERT INTO categories (Name)
     SELECT %s
@@ -165,12 +220,12 @@ db.test_query('categories')
 # Define the table creation query
 table_query = """
     CREATE TABLE apps (
-        id SERIAL PRIMARY KEY,
+        "App ID" SERIAL PRIMARY KEY,
         name VARCHAR(256) NOT NULL
     )
 """
 # Create the table
-db.create_table(table_query)
+db.create_table(table_query, 'apps')
 # Define the query for inserting data into the table
 insert_query = """
     INSERT INTO apps (name)
@@ -187,7 +242,7 @@ db.test_query('apps', True)
 table_query = """
     CREATE TABLE Main (
     "Index" INT,
-    "App ID" INT REFERENCES apps("id"),
+    "App ID" INT REFERENCES apps("App ID"),
     "Category ID" INT REFERENCES categories("Category ID"),
     Rating VARCHAR(10),
     Reviews VARCHAR(50),
@@ -201,7 +256,7 @@ table_query = """
     "Age Restriction" VARCHAR(50)
     )
 """
-db.create_table(table_query)
+db.create_table(table_query, 'Main')
 query = """INSERT INTO Main (
                 "Index", "App ID", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
                 "Content Rating", Genres, "Last Updated", "Age Restriction") 
@@ -211,3 +266,21 @@ db.insert_values_apps(path, query)
 db.test_query('Main', True)
 
 #REVIEWS TABLE
+# Define the table creation query
+table_query = """
+    CREATE TABLE reviews (
+        id SERIAL PRIMARY KEY,
+        "App ID" INT REFERENCES apps("App ID"),
+        review TEXT
+    )
+"""
+# Define the query for inserting data into the table
+insert_query = """
+    INSERT INTO reviews ("App ID", review)
+    SELECT %s, %s
+    WHERE NOT EXISTS (
+        SELECT 1 FROM reviews WHERE "App ID" = %s AND review = %s
+    )
+"""
+path = './database/output/processed_reviews.csv'
+db.insert_values_reviews(path, insert_query)

@@ -8,47 +8,50 @@ class DataPreprocessor:
         pass
 
     def pipeline(self, df, copy: bool = False):
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content Rating', 'Genres', 'Last Updated', 'Current Ver', 'Android Ver']] = np.NaN, 1.9, '19', '3.0M', '1,000+', 'Free', '0', 'Everyone', np.NaN, 'February 11, 2018', '1.0.19', '4.0 and up'
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Genres']] = 'LIFESTYLE', 'Lifestyle'
         if copy:
             df = df.copy()
-        df['Last Updated'] = pd.to_datetime(df['Last Updated'])                                                 #       Def Pipeline:
+        df.columns = df.columns.str.lower()
+        df.columns = df.columns.str.replace(' ', '_')
+        df.loc[df['app'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['category', 'rating', 'reviews', 'size', 'installs', 'type', 'price', 'content_rating', 'genres', 'last_updated', 'current_ver', 'android_ver']] = np.NaN, 1.9, '19', '3.0M', '1,000+', 'Free', '0', 'Everyone', np.NaN, 'February 11, 2018', '1.0.19', '4.0 and up'
+        df.loc[df['app'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['category', 'genres']] = 'LIFESTYLE', 'Lifestyle'
+        df['last_updated'] = pd.to_datetime(df['last_updated'])                                                 #       Def Pipeline:
         self.drop_outdated(df)                                                                                  # - - Runs DataPreprocessor pipeline's methods
-        df['Category'] = pd.Categorical(df['Category'])
-        self.to_bytes(df, 'Size')
+        df['category'] = pd.Categorical(df['category'])
+        self.to_bytes(df, 'size')
         self.estimate_size(df)
         self.genre_cleaning(df)
-        df['Genres'] = pd.Categorical(df['Genres'])
-        df['Size'] = df['Size'].astype('Int32')
+        df['genres'] = pd.Categorical(df['genres'])
+        df['size'] = df['size'].astype('Int32')
         self.installs_cleaning(df)
         self.price(df)
         self.rating_fillna(df)
         self.reviews_to_int(df)
         self.drop_na_values(df)
-        df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
-        self.transform_age(df, 'Content Rating')
+        df.drop(columns=['current_ver', 'android_ver'], inplace=True)
+        self.transform_age(df, 'content_rating')
         self.rename_categories(df)
-        self.comma_replacer(df, 'App')
-        self.quotatione_marks_replacer(df, 'App')
-        self.drop_duplicates(df, 'App')
+        self.comma_replacer(df, 'app')
+        self.quotatione_marks_replacer(df, 'app')
+        self.drop_duplicates(df, 'app')
+        df.index.name = 'index'
         return df
     
     
     def pipeline_reviews(self, df):                                                                             #       Def Pipeline_Reviews:
         df = df.dropna()                                                                                        # - Drops rows with missing values
-        df = df[['App', 'Translated_Review']]                                                                   # - Selects 'App' and 'Translated_Review' columns
+        df = df[['app', 'translated_review']]                                                                   # - Selects 'App' and 'Translated_Review' columns
         return df                                                                                               # - Returns the updated DataFrame
     
 
     
     def drop_outdated(self, df):                                                                                #       Def Drop_Outdated:
                                                                                                                 # - Sorts the DataFrame by 'Last Updated'
-        df.sort_values(by='Last Updated', inplace=True)                                                         # - Drops duplicate entries, keeping the most recent one
+        df.sort_values(by='last_updated', inplace=True)                                                         # - Drops duplicate entries, keeping the most recent one
                                                                                                                 # - Ignores 'Reviews', 'Category', and 'Last Updated'
         df.drop_duplicates(
-            subset = ['App', 'Rating', 'Size', 'Installs', 'Type',
-                'Price', 'Content Rating', 'Genres', 'Current Ver',
-                'Android Ver'], 
+            subset = ['app', 'rating', 'size', 'installs', 'type',
+                'price', 'content_rating', 'genres', 'current_ver',
+                'android_ver'], 
             keep = 'last', 
             inplace = True)
         
@@ -77,44 +80,44 @@ class DataPreprocessor:
                                                                                                                                             # - Estimates the average size for each category
         categories_mean_size = {}                                                                                                           # - Fills missing size values with the category average
 
-        for category in df['Category'].unique():
-            category_mean = df.loc[(df['Category'] == category) & (df['Size'] != 'Varies with device'), 'Size'].mean()
+        for category in df['category'].unique():
+            category_mean = df.loc[(df['category'] == category) & (df['size'] != 'Varies with device'), 'size'].mean()
             categories_mean_size[category] = math.floor(category_mean)
 
-        for category in df['Category'].unique():
-            df.loc[(df['Category'] == category) & (df['Size'] == 'Varies with device'), 'Size'] = categories_mean_size[category]
-            df.loc[df['Size'].isna(), 'Size'] = categories_mean_size[category]
+        for category in df['category'].unique():
+            df.loc[(df['category'] == category) & (df['size'] == 'Varies with device'), 'size'] = categories_mean_size[category]
+            df.loc[df['size'].isna(), 'size'] = categories_mean_size[category]
 
 
 
     def genre_cleaning(self, df):                                                                               #       Def Genre_Cleaning
                                                                                                                 # - Cleans the 'Genres' column by keeping only the first genre if multiple are present
-        df['Genres'] = df['Genres'].str.split(';', expand=True)[0]                                              
+        df['genres'] = df['genres'].str.split(';', expand=True)[0]                                              
 
 
 
     def size_to_int(self, df):                                                                                  #       Def Size_to_Int
                                                                                                                 # - Converts 'Size' column to integer type.                                                                   
-        df['Size'] = df['Size'].astype('Int32')
+        df['size'] = df['size'].astype('Int32')
 
 
 
     def installs_cleaning(self, df):                                                                                                        #       Def Installs_Cleaning:
                                                                                                                                             # - Cleans the 'Installs' column by extracting numerical values
-        df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)                  # - Converts the column to an integer data type
+        df['installs'] = df['installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)                  # - Converts the column to an integer data type
         
 
 
     def price(self, df):                                                                                        #       Def Price:
                                                                                                                 # - Removes the '$' sign from the 'Price' column
-        df['Price'] = np.array([value.replace('$', '') for value in df['Price']]).astype(float)                 # - Converts the column to a float data type
+        df['price'] = np.array([value.replace('$', '') for value in df['price']]).astype(float)                 # - Converts the column to a float data type
         
  
 
     def rating_fillna(self, df):                                                                                #       Def Rating_Fillna:
                                                                                                                 # - Replaces NaN values in the 'Rating' column with the mean rating         
-        mean = round(df['Rating'].dropna().mean(), 1)                                                           
-        df['Rating'].fillna(mean, inplace=True)
+        mean = round(df['rating'].dropna().mean(), 1)                                                           
+        df['rating'].fillna(mean, inplace=True)
         
 
 
@@ -122,14 +125,14 @@ class DataPreprocessor:
                                                                                                                 # - Converts the 'Reviews' column to an integer data type
         n=0                                                                                                     # - Handles non-integer values gracefully
         except_ls=[]
-        for i in df['Reviews']:
+        for i in df['reviews']:
             try:
                 int_value=int(i)
-                df['Reviews'].values[n]=int_value
+                df['reviews'].values[n]=int_value
             except:
                 except_ls.append([n,i])
             n+=1
-        df['Reviews']=df['Reviews'].astype({'Reviews':'Int32'}, copy=False)
+        df['reviews']=df['reviews'].astype({'reviews':'Int32'}, copy=False)
         
 
 
@@ -150,8 +153,8 @@ class DataPreprocessor:
             "Adults only 18+": 18, 
             "Unrated" : 0
         }
-        df['Age Restriction'] = df[column].map(age_map).fillna(0).astype(int)
-        df.loc[df['Content Rating'] == 'Unrated', 'Content Rating'] = 'Everyone'
+        df['age_restriction'] = df[column].map(age_map).fillna(0).astype(int)
+        df.loc[df['content_rating'] == 'Unrated', 'content_rating'] = 'Everyone'
     
 
     
@@ -161,7 +164,7 @@ class DataPreprocessor:
 
     def rename_categories(self, df):                                                                            #       Def Rename_Categories:
                                                                                                                 # - Rename Categories in a nicer fashion
-        df['Category'] = df['Category'].str.replace('_', ' ').str.capitalize()
+        df['category'] = df['category'].str.replace('_', ' ').str.capitalize()
 
     def comma_replacer(self, df, col):                                                                          #       Def Comma_Replacer:
                                                                                                                 # - Replace comma with empty string

@@ -1,14 +1,12 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
-import matplotlib.transforms as transforms
 import numpy as np
 import pandas as pd
 
 class DataVisualizer:
 
-    def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False,
-                 show: bool = True, save: bool = False):
+    def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False, show: bool = True, save: bool = False):
         self.library = library
         self.show = show
         self.save = save
@@ -16,35 +14,24 @@ class DataVisualizer:
             sns.set_theme(style=style)
 
     def pipeline(self, df, df_all):
-        if self.library == 'seaborn':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-            self.scatter_plot(df, 'Installs', 'Reviews')
-            self.countplot(df, var='Category', hue='Type')
-            self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-            self.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-            self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-            self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-            self.rating_counter(df, "Rating", "Type")                                        #number of Apps in each Type (free, paid) for each Rating range
-            self.growth_trend(df)
-            self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
-            self.violin_plot(df,x='Category',y='Rating',hue='Type')
-            self.box_plot(df,x='Category',y='Rating',hue='Type')
-            self.stacked_bar(df)
-
-        elif self.library == 'matplotlib':
-            self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
-            self.scatter_plot(df, 'Installs', 'Reviews')
-            self.countplot(df, var='Category', hue='Type')
-            self.grouped_rating(df, ["Category", "Type"], "Rating")                          #average Rating devided in free and paid Apps for each Category
-            self.grouped_rating(df, "Category", "Rating")                                    #average Rating per Category
-            self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
-            self.rating_counter(df, "Rating", "Category")                                    #number of Apps in each Category for each Rating range
-            self.rating_counter(df, "Rating", "Type")
-            self.growth_trend(df)
-            self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
-
+        print(df.head())
+        print(df.dtypes)
+        print(df_all.head())
+        print(df_all.dtypes)
+        self.barh_by_grouping(df, column="rating", group_by="category", agg='sum')
+        #self.scatter_plot(df, 'installs', 'reviews')
+        self.countplot(df, var='category', hue='type')
+        self.grouped_rating(df, ["category", "type"], "rating")                          #average Rating devided in free and paid Apps for each Category
+        self.grouped_rating(df, "category", "rating")                                    #average Rating per category
+        self.popularity_score(df)                                                        #top 10 Apps by Popularity (Rating*Installs)
+        self.rating_counter(df, "rating", "category")                                    #number of Apps in each Category for each Rating range
+        self.rating_counter(df, "rating", "type")                                        #number of Apps in each Type (free, paid) for each Rating range
+        self.growth_trend(df)
+        #self.correlation_heatmap(df)
+        self.sent_category_hbar(df_all)
+        #self.violin_plot(df,x='category',y='rating',hue='type')
+        #self.box_plot(df,x='categoty',y='rating',hue='type')
+        self.stacked_bar(df)
         
 # Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
     def barh_by_grouping(self, df, column, group_by, agg):
@@ -53,7 +40,6 @@ class DataVisualizer:
         fig, ax = plt.subplots(figsize=(15, 6))
 
         if self.library == "seaborn":
-            #FYI Seaborn e matplotlib order opposite ways
             sns.barplot(data=data.sort_values(by=column, ascending=False), 
                         y=group_by,
                         x=column,
@@ -63,7 +49,6 @@ class DataVisualizer:
                 plt.savefig('./database/output/graphs/barh_by_grouping_sns.png')
 
         elif self.library == 'matplotlib':
-            # FYI Purtroppo seaborn e matplotlib ordinano i valori in maniera opposta
             data = df.groupby(by=group_by)[column].agg(agg).reset_index().sort_values(by=column, ascending=True) 
 
             ax.barh(y=group_by, width=column, data=data)
@@ -79,9 +64,9 @@ class DataVisualizer:
         if self.show:
             plt.show()
 
+    def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
+        '''Show the counts of observations in each categorical bin using bars.
 
-# Shows observation counts bar in each categorical bin differentiated by 'hue' parameter.
-    '''Show the counts of observations in each categorical bin using bars.
         Args:
             df: DataFrame
                 Dataset for plotting
@@ -95,8 +80,6 @@ class DataVisualizer:
                     is decided based on the number of unique values in var.
         Returns: Display graph.'''
 
-    def countplot(self, df, var:str, hue:str=None, orientation: Literal['orizzontal', 'vertical'] = None):
-        
         fig, ax = plt.subplots()
         plt.subplots_adjust(left= 0.3)
 
@@ -163,7 +146,7 @@ class DataVisualizer:
         
 # Creates a scatter plot for two numerical columns in a dataframe.
     def scatter_plot(self, df, col1, col2): 
-        print(df[col1].values, "\n", np.asarray(df[col2].values, dtype=int))
+
         def rho(col1, col2):
             r = np.corrcoef(col1, col2)   # np.array(col1), np.asarray(df[col2].values, dtype=int)
             return r[0,1]
@@ -195,7 +178,7 @@ class DataVisualizer:
 
 
 # Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
-    def grouped_rating(self, df, by: Literal["Category", "Type"], column, n= None, ascending= False):
+    def grouped_rating(self, df, by: Literal["category", "type"], column, n= None, ascending= False):
     
         df_group = df.groupby(by= by)[column].agg(["mean", "max", "min"]).sort_values(["mean", "max", "min"], ascending= [ascending, ascending, ascending]).head(n)
 
@@ -216,11 +199,11 @@ class DataVisualizer:
                     plt.savefig('./database/output/graphs/Rating_distribution_by_category_sns.png')              
             else:
                 df_group = df.groupby(by)[column].mean().unstack().sort_values(["Free", "Paid"], ascending = [ascending, ascending]).reset_index().head(n)
-                df_melted = pd.melt(df_group, id_vars= "Category", var_name='Type', value_name='Rating')
-                sns.barplot(x= "Category", y= "Rating", data=df_melted, hue= "Type", palette= ["blue", "yellow"])
-                ax.set_ylabel("Rating")
-                ax.set_xticklabels(df_melted.Category.unique(), rotation=90)
-                ax.set_title("Average Rating of free and paid Apps in each Category")
+                df_melted = pd.melt(df_group, id_vars= "category", var_name='type', value_name='rating')
+                sns.barplot(x= "category", y= "rating", data=df_melted, hue= "type", palette= ["blue", "yellow"])
+                ax.set_ylabel("rating")
+                ax.set_xticklabels(df_melted['category'].unique(), rotation=90)
+                ax.set_title("Average rating of free and paid Apps in each category")
                 ax.legend()
                 if self.save:
                     plt.savefig('./database/output/graphs/Type_distribution_by_category_sns.png')
@@ -231,7 +214,7 @@ class DataVisualizer:
                 plt.bar(df_group.index, df_group["mean"], color= "r", label='Average')
                 plt.bar(df_group.index, df_group["min"], color= "b", label='Min')
                 plt.legend() 
-                plt.ylabel("Rating")
+                plt.ylabel("rating")
                 plt.xticks(rotation= "vertical")
                 plt.title(f"Rating distribution by {by} sorted by highest average")
                 if self.save:
@@ -245,9 +228,9 @@ class DataVisualizer:
                 y_paid = df_group.Paid.fillna(0).values                
                 plt.bar(x - bar_width / 2, y_free, bar_width, color= "steelblue", label="Free")
                 plt.bar(x + bar_width / 2, y_paid, bar_width, color= "orange", label="Paid")
-                plt.ylabel("Rating")
+                plt.ylabel("rating")
                 plt.xticks(x, df_group.index, rotation= 90)
-                plt.title("Average Rating of free and paid Apps in each Category")
+                plt.title("Average rating of free and paid Apps in each Category")
                 plt.legend()
                 if self.save:
                     plt.savefig('./database/output/graphs/Type_distribution_by_category_mat.png')
@@ -260,33 +243,33 @@ class DataVisualizer:
 # of installs, and creates a bar chart for the top 10 apps by popularity score.
     def popularity_score(self, df, n= 10, ascending= False, all_info= False, free= "all"):
         df_copy = df.copy()
-        df_copy["Popularity"] = round(df_copy.Installs * df_copy.Rating / (int(str(max(df_copy.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10), 4)
+        df_copy["popularity"] = round(df_copy['installs'] * df_copy['rating'] / (int(str(max(df_copy['installs']))[:-3]) if len(str(max(df['installs']))) > 7 else 10), 4)
 
         if free != "all":
             if free == True:
-                df_popularity = df_copy[df_copy["Type"] == "Free"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App","Popularity"]].head(n)
+                df_popularity = df_copy[df_copy["type"] == "Free"].sort_values(by= ["popularity", "installs", "rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["app","popularity"]].head(n)
             else:
-                df_popularity = df_copy[df_copy["Type"] == "Paid"].sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App", "Popularity"]].head(n)
+                df_popularity = df_copy[df_copy["type"] == "Paid"].sort_values(by= ["popularity", "installs", "rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["app", "popularity"]].head(n)
         else:
-            df_popularity = df_copy.sort_values(by= ["Popularity", "Installs", "Rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["App", "Popularity"]].head(n)
+            df_popularity = df_copy.sort_values(by= ["popularity", "installs", "rating"], ascending= [ascending, ascending, ascending])[df_copy.columns if all_info else ["app", "popularity"]].head(n)
         
         fig, ax = plt.subplots(figsize= (16, 8))
         plt.subplots_adjust(bottom= 0.3)
         
         if self.library == "seaborn":
-            sns.barplot(x= df_popularity["App"], y= df_popularity["Popularity"], color='steelblue', width=0.5)
+            sns.barplot(x= df_popularity["app"], y= df_popularity["popularity"], color='steelblue', width=0.5)
             ax.set_xticklabels(ax.get_xticklabels(), rotation= 45, ha='right')
-            ax.set(xlabel= "Apps", ylabel= f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
+            ax.set(xlabel= "Apps", ylabel= f"Popularity (installs*rating/{int(str(max(df['installs']))[:-3]) if len(str(max(df['installs']))) > 7 else 10})")
             ax.set_title(f"Top {n} Apps by Popularity")
             if self.save:
                 plt.savefig('./database/output/graphs/popularity_rating_sns.png')
             
         else:
-            plt.bar(df_popularity["App"], df_popularity["Popularity"], width=0.5)
+            plt.bar(df_popularity["app"], df_popularity["popularity"], width=0.5)
             plt.xticks(rotation= 45, ha='right')
             plt.xlabel("Apps")
             plt.ylabel(f"Popularity (Installs*Rating/{int(str(max(df.Installs))[:-3]) if len(str(max(df.Installs))) > 7 else 10})")
-            plt.title(f"Top {n} Apps by Popularity")
+            plt.title(f"Top {n} apps by popularity")
             if self.save:
                 plt.savefig('./database/output/graphs/popularity_rating_mat.png')
 
@@ -296,7 +279,7 @@ class DataVisualizer:
 
 # Creates a bar chart for the number of apps in each rating range divided by a categorical 
 # variable such as category or type.    
-    def rating_counter(self, df, column, by: Literal["Category", "Type"], n= None, ascending= False):
+    def rating_counter(self, df, column, by: Literal["category", "type"], n= None, ascending= False):
 
         data = df.groupby(by= by)[column].apply(lambda x: pd.cut(x, bins= [1,2,3,4,5]).value_counts()).unstack()
         
@@ -306,13 +289,13 @@ class DataVisualizer:
         if self.library == "seaborn":
             data.columns = ["1-2", "2-3", "3-4", "4-5"]  
 
-            if by == "Category":    
+            if by == "category":    
                 data = data[["4-5", "3-4", "2-3", "1-2"]]
                 data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
-                data_melted = data.reset_index().melt(id_vars= by, var_name= "Rating", value_name= "App Count")
-                sns.barplot(x= by, y= "App Count", data= data_melted, hue= "Rating")
+                data_melted = data.reset_index().melt(id_vars= by, var_name= "rating", value_name= "app_count")
+                sns.barplot(x= by, y= "app_count", data= data_melted, hue= "rating")
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
-                ax.set(xlabel= "Categories", ylabel= "App Count")   
+                ax.set(xlabel= "categories", ylabel= "app_count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
                 if self.save:
                     plt.savefig('./database/output/graphs/rating_counter_category_sns.png')    
@@ -320,15 +303,15 @@ class DataVisualizer:
                 data.columns = ["4-5", "3-4", "2-3", "1-2"]
 
                 data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
-                data_melted = data.reset_index().melt(id_vars= by, var_name= "Rating", value_name= "App Count")
-                sns.barplot(x= by, y= "App Count", data= data_melted, hue= "Rating")
+                data_melted = data.reset_index().melt(id_vars= by, var_name="rating", value_name= "app_count")
+                sns.barplot(x= by, y= "app_count", data= data_melted, hue="rating")
                 ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
-                ax.set(xlabel= "Categories", ylabel= "App Count")   
+                ax.set(xlabel= "categories", ylabel= "App Count")   
                 ax.set_title(f"Number of Apps in each Rating range devided by {by}")
                 if self.save:
                     plt.savefig('./database/output/graphs/rating_counter_type_sns.png')          
         else:
-            if "Category" in by:
+            if "category" in by:
                 data.columns = ["1-2", "2-3", "3-4", "4-5"]
                 data = data.sort_values(by= ["4-5", "3-4", "2-3", "1-2"], ascending= [ascending,ascending,ascending,ascending])
                 x = np.arange(df[by].nunique())*1.75
@@ -342,9 +325,9 @@ class DataVisualizer:
                 plt.bar(x + (3*0.1) / 2, x3, 0.3, label= "2-3")
                 plt.bar(x + (9*0.1) / 2, x4, 0.3, label= "1-2")
                 plt.xticks(x, df[by].unique(), rotation= "vertical")
-                plt.ylabel("App Count")
+                plt.ylabel("App count")
                 plt.legend()
-                plt.title(f"Number of Apps in each Rating range devided by {by}")
+                plt.title(f"Number of apps in each Rating range devided by {by}")
                 if self.save:
                     plt.savefig('./database/output/graphs/rating_counter_category_mat.png')   
             elif "Type" in by:
@@ -377,20 +360,20 @@ class DataVisualizer:
         
         fig, ax = plt.subplots()
 
-        df = df[['App', 'Category', 'Last Updated']]
+        df = df[['app', 'category', 'last_updated']]
         #1 Selezione categorie da mostrare nel grafico
-        categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
-        df_main = df[df['Category'].isin(categories)]
-        df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
+        categories = ['entertainment', 'business', 'family', 'finance', 'productivity']
+        df_main = df[df['category'].isin(categories)]
+        df_main.loc[:, 'last_updated'] = pd.to_datetime(df['last_updated'])
         #2 group by anno e conteggio numero app per categoria per ogni anno
-        grouped = df_main.groupby([df_main['Last Updated'].dt.year, 'Category'])['Category'].count()
+        grouped = df_main.groupby([df_main['last_updated'].dt.year, 'category'])['category'].count()
         #3 Riempi i valori nan con 0
         trend = grouped.unstack(level=1, fill_value=0)
 
         # Ripeti i passaggi 1, 2, 3 per creare un altro dataframe che possa computare la media delle categorie mancanti
-        df_else = df[~df['Category'].isin(categories)]
-        df_else.loc[:, 'Last Updated'] = pd.to_datetime(df_else['Last Updated'])
-        grouped_else = df_else.groupby([df_else['Last Updated'].dt.year, 'Category'])['Category'].count()
+        df_else = df[~df['category'].isin(categories)]
+        df_else.loc[:, 'last_updated'] = pd.to_datetime(df_else['last_updated'])
+        grouped_else = df_else.groupby([df_else['last_updated'].dt.year, 'category'])['category'].count()
         trend_else = grouped_else.unstack(level=1, fill_value=0)
         trend_else_mean = trend_else.mean(axis=1)
 
@@ -467,7 +450,7 @@ class DataVisualizer:
 
 # Creates a bar chart for the average sentiment score of apps in each category.
     def sent_category_hbar(self, df_all):
-        data = df_all.groupby("Category")["sentiment score"].mean().sort_values(ascending= False)
+        data = df_all.groupby("category")["sentiment_score"].mean().sort_values(ascending= False)
 
         fig, ax = plt.subplots(figsize= (16, 8))
         plt.subplots_adjust(bottom = 0.25)
@@ -478,7 +461,7 @@ class DataVisualizer:
             sns.barplot(x= data.index.astype(str), y= data.values, data= data, order= data.sort_values(ascending= False), color='b')
             ax.set_xticks(x + width, data.index)
             ax.set_xticklabels(ax.get_xticklabels(), rotation= "vertical")
-            ax.set(xlabel= "Categories", ylabel= "Sentiment Score")
+            ax.set(xlabel= "categories", ylabel= "sentiment_score")
             if self.save:
                 plt.savefig('./database/output/graphs/sentiment_by_category_sns.png')
 
@@ -486,8 +469,8 @@ class DataVisualizer:
             data = data.sort_values(ascending= False)
             plt.bar(data.index, data.values)
             plt.xticks(rotation= 'vertical', fontsize= 10)
-            plt.xlabel(xlabel= "Categories")
-            plt.ylabel("Avg Sentiment")
+            plt.xlabel(xlabel= "categories")
+            plt.ylabel("avg_sentiment")
             if self.save:
                 plt.savefig('./database/output/graphs/sentiment_by_category_mat.png')
         plt.title("Average sentiment per Category")
@@ -534,10 +517,10 @@ class DataVisualizer:
 # Creates a stacked bar plot that displays the number of apps based on category and type
     def stacked_bar(self, df):
         # Create a grouped dataframe by Category and Type
-        grouped = df.groupby(['Category', 'Type'])['Rating'].count().reset_index().sort_values(by='Rating', ascending=False)
+        grouped = df.groupby(['category', 'type'])['rating'].count().reset_index().sort_values(by='rating', ascending=False)
 
         # Create a pivot table to plot the data as a stacked barplot
-        pivot = grouped.pivot(index='Category', columns='Type', values='Rating').fillna(0)
+        pivot = grouped.pivot(index='category', columns='type', values='rating').fillna(0)
 
         # Create the stacked barplot
         fig = plt.figure(figsize=(40, 20))

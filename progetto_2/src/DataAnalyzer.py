@@ -11,13 +11,13 @@ class DataAnalyzer():
 
     def sentiment_score(self, df, df_reviews, p_words, n_words):                                           #      Def Sentiment_Score:                                                                                                                                                         
                                                                                                            # - Filters out rows with missing translated reviews
-        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)           # - Aggregates sentiment scores by App
+        df_reviews = df_reviews[~df_reviews["translated_review"].isna()].reset_index(drop= True)           # - Aggregates sentiment scores by App
                                                                                                            # - Calculates sentiment scores for each review using Afinn
         afinn = Afinn()                                                                                    # - Merges aggregated scores with the original DataFrame #
                                                                                                            # - Returns the updated DataFrames
         score_list = []
 
-        for review in df_reviews["Translated_Review"]:
+        for review in df_reviews["translated_review"]:
 
             score_tot = 0
             review_words = str(review).lower().split()
@@ -29,12 +29,9 @@ class DataAnalyzer():
 
             score_list.append(score_tot)
 
-        df_reviews["sentiment score"] = pd.Series(score_list)
+        df_reviews["sentiment_score"] = pd.Series(score_list)
         
-        df_sentiment = df_reviews.groupby("App")["sentiment score"].mean()
-
-        print(df.head(5))
-        print(df_sentiment.head(5))
+        df_sentiment = df_reviews.groupby("app")["sentiment_score"].mean()
         
         df_all = df.merge(df_sentiment, on= "app")
         

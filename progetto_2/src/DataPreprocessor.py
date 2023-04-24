@@ -10,8 +10,7 @@ class DataPreprocessor:
     def pipeline(self, df, copy: bool = False):
         if copy:
             df = df.copy()
-        df.columns = df.columns.str.lower()
-        df.columns = df.columns.str.replace(' ', '_')
+        self.format_column_names(df)
         df.loc[df['app'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['category', 'rating', 'reviews', 'size', 'installs', 'type', 'price', 'content_rating', 'genres', 'last_updated', 'current_ver', 'android_ver']] = np.NaN, 1.9, '19', '3.0M', '1,000+', 'Free', '0', 'Everyone', np.NaN, 'February 11, 2018', '1.0.19', '4.0 and up'
         df.loc[df['app'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['category', 'genres']] = 'LIFESTYLE', 'Lifestyle'
         df['last_updated'] = pd.to_datetime(df['last_updated'])                                                 #       Def Pipeline:
@@ -33,16 +32,18 @@ class DataPreprocessor:
         self.comma_replacer(df, 'app')
         self.quotatione_marks_replacer(df, 'app')
         self.drop_duplicates(df, 'app')
-        df.index.name = 'index'
         return df
     
     
-    def pipeline_reviews(self, df):                                                                             #       Def Pipeline_Reviews:
+    def pipeline_reviews(self, df):
+        self.format_column_names(df)                                                                                 #       Def Pipeline_Reviews:
         df = df.dropna()                                                                                        # - Drops rows with missing values
         df = df[['app', 'translated_review']]                                                                   # - Selects 'App' and 'Translated_Review' columns
         return df                                                                                               # - Returns the updated DataFrame
     
-
+    def format_column_names(self, df):
+        df.columns = df.columns.str.lower()
+        df.columns = df.columns.str.replace(' ', '_')
     
     def drop_outdated(self, df):                                                                                #       Def Drop_Outdated:
                                                                                                                 # - Sorts the DataFrame by 'Last Updated'

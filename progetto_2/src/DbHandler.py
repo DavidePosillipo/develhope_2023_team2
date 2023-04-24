@@ -2,7 +2,7 @@ import psycopg2
 import csv
 import pandas as pd
 
-class db_handler():
+class DbHandler():
     def __init__(self, database, user, password, host, database_name):
         self.database = database 
         self.user = user # user name used to authenticate
@@ -205,9 +205,6 @@ class db_handler():
         
         df = df.copy()
         df['app_id'] = df.index
-
-        apps_names_df = df.loc[:, ['app_id','app']]
-        #print(apps_names_df)
 
         categories = list(df['category'].unique())
         catgories_df = pd.DataFrame(categories, columns=['categories'])

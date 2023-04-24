@@ -2,8 +2,6 @@ import pandas as pd
 from PIL import Image
 import os
 from typing import Literal
-import psycopg2
-import csv
 
 class DataIngestor:
 

@@ -27,10 +27,10 @@ class DataVisualizer:
         self.rating_counter(df, "rating", "category")                                    #number of Apps in each Category for each Rating range
         self.rating_counter(df, "rating", "type")                                        #number of Apps in each Type (free, paid) for each Rating range
         self.growth_trend(df)
-        #self.correlation_heatmap(df)
+        self.correlation_heatmap(df)
         self.sent_category_hbar(df_all)
-        #self.violin_plot(df,x='category',y='rating',hue='type')
-        #self.box_plot(df,x='categoty',y='rating',hue='type')
+        self.violin_plot(df,x='category',y='rating',hue='type')
+        self.box_plot(df,x='categoty',y='rating',hue='type')
         self.stacked_bar(df)
         
 # Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
@@ -77,8 +77,9 @@ class DataVisualizer:
                 in different bars
             orientation: str, optional
                     Allows to specify the orientation of the graph. If not given the orientation
-                    is decided based on the number of unique values in var.
-        Returns: Display graph.'''
+                    is automatically decided based on the number of unique values in var.
+        Returns:
+            Display graph.'''
 
         fig, ax = plt.subplots()
         plt.subplots_adjust(left= 0.3)

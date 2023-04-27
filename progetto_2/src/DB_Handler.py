@@ -134,21 +134,20 @@ class DB_Handler():
             self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
             # Open a cursor to perform database operations
             self.cur = self.conn.cursor()
+            # Read in the CSV file and insert data into the apps table
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
                 next(reader)  # skip the header row
                 for row in reader:
-                    app, review = row
-                    app_id_query = """SELECT "App ID" FROM apps WHERE "name" = %s"""
-                    self.cur.execute(app_id_query, (app,))
+                    app_id, translated_review = row
+                    app_id_query = """SELECT "App ID" FROM Apps WHERE "name" = %s"""
+                    self.cur.execute(app_id_query, (app_id,))
                     app_id = self.cur.fetchone()[0]
-                    app_values = (app_id, review)
+                    app_values = (app_id, translated_review)
                     self.cur.execute(query, app_values)
-            # Commit the transaction
-            self.conn.commit()
-            print("Data inserted successfully")
+            print("Values inserted into table reviews successfully.")
         except psycopg2.Error as e:
-            print("Error inserting data:", e)
+            print("Error creating table:", e)
         finally:
             if self.conn is not None:
                 self.cur.close()
@@ -181,7 +180,7 @@ class DB_Handler():
             cur = conn.cursor()
             # Execute a SELECT query on the table
             if limit==True:
-                cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
+                cur.execute(f"SELECT * FROM {table_name};")
             else:
                 cur.execute(f"SELECT * FROM {table_name};")
             rows = cur.fetchall()
@@ -194,7 +193,29 @@ class DB_Handler():
             if conn is not None:
                 cur.close()
                 conn.close()
-
+    def test_query2(self, table_name, limit=False):
+        try:
+            # Connect to the PostgreSQL server
+            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            # Open a cursor to perform database operations
+            cur = conn.cursor()
+            # Execute a SELECT query on the table
+            if limit==True:
+                cur.execute("""
+    SELECT "App ID" FROM apps WHERE name = '10 Best Foods for You';
+""")
+            else:
+                cur.execute(f"SELECT * FROM {table_name};")
+            rows = cur.fetchall()
+            # Print the rows returned by the query
+            for row in rows:
+                print(row)
+        except psycopg2.Error as e:
+            print("Error executing SELECT query:", e)
+        finally:
+            if conn is not None:
+                cur.close()
+                conn.close()
 db = DB_Handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
 
 # CATEGORY TABLE
@@ -236,7 +257,7 @@ insert_query = """
 """
 # Insert data from CSV file into the table
 db.app('./database/output/processed_googleplaystore.csv', insert_query)
-db.test_query('apps', True)
+db.test_query2('apps', True)
 
 # APPS TABLE
 table_query = """
@@ -268,19 +289,22 @@ db.test_query('Main', True)
 #REVIEWS TABLE
 # Define the table creation query
 table_query = """
-    CREATE TABLE reviews (
-        id SERIAL PRIMARY KEY,
-        "App ID" INT REFERENCES apps("App ID"),
-        review TEXT
-    )
-"""
+            CREATE TABLE IF NOT EXISTS reviews (
+                ReviewID SERIAL PRIMARY KEY,
+                AppID INT REFERENCES apps("App ID"),
+                Translated_review TEXT
+            )
+        """
+db.create_table(table_query, 'reviews')
 # Define the query for inserting data into the table
 insert_query = """
     INSERT INTO reviews ("App ID", review)
-    SELECT %s, %s
+    SELECT a."App ID", r.Translated_Review
+    FROM apps a
+    INNER JOIN reviews_csv r ON a.App = r.App
     WHERE NOT EXISTS (
-        SELECT 1 FROM reviews WHERE "App ID" = %s AND review = %s
+        SELECT 1 FROM reviews WHERE "App ID" = a."App ID" AND review = r.Translated_Review
     )
 """
-path = './database/output/processed_reviews.csv'
+path = r'C:\Users\Crypto.gunner\Desktop\CODING\DevelHope\Progetto_APP\develhope_2023_team2\progetto_2\database\output\processed_reviews.csv'
 db.insert_values_reviews(path, insert_query)

@@ -234,8 +234,6 @@ insert_query = """
     )
 """
 db.insert_values_categories('./database/output/processed_googleplaystore.csv', insert_query)
-db.test_query('categories')
-
 
 # APP TABLE
 # Define the table creation query
@@ -257,7 +255,6 @@ insert_query = """
 """
 # Insert data from CSV file into the table
 db.app('./database/output/processed_googleplaystore.csv', insert_query)
-db.test_query2('apps', True)
 
 # APPS TABLE
 table_query = """
@@ -284,27 +281,3 @@ query = """INSERT INTO Main (
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 path = './database/output/processed_googleplaystore.csv'
 db.insert_values_apps(path, query)
-db.test_query('Main', True)
-
-#REVIEWS TABLE
-# Define the table creation query
-table_query = """
-            CREATE TABLE IF NOT EXISTS reviews (
-                ReviewID SERIAL PRIMARY KEY,
-                AppID INT REFERENCES apps("App ID"),
-                Translated_review TEXT
-            )
-        """
-db.create_table(table_query, 'reviews')
-# Define the query for inserting data into the table
-insert_query = """
-    INSERT INTO reviews ("App ID", review)
-    SELECT a."App ID", r.Translated_Review
-    FROM apps a
-    INNER JOIN reviews_csv r ON a.App = r.App
-    WHERE NOT EXISTS (
-        SELECT 1 FROM reviews WHERE "App ID" = a."App ID" AND review = r.Translated_Review
-    )
-"""
-path = r'C:\Users\Crypto.gunner\Desktop\CODING\DevelHope\Progetto_APP\develhope_2023_team2\progetto_2\database\output\processed_reviews.csv'
-db.insert_values_reviews(path, insert_query)

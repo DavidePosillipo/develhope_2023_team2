@@ -1,0 +1,8 @@
+pandas
+Pillow
+Afinn
+psycopg2
+csv
+pendulum
+math
+numpy

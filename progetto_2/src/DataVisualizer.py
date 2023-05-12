@@ -1,7 +1,6 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
-import matplotlib.transforms as transforms
 import numpy as np
 import pandas as pd
 

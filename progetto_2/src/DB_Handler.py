@@ -73,7 +73,7 @@ class DB_Handler():
                 self.cur.close()
                 self.conn.close()
     
-    def app(self, path, query):
+    def insert_values_apps(self, path, query):
         try:
             # Connect to the PostgreSQL server
             self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
@@ -98,7 +98,7 @@ class DB_Handler():
                 self.conn.close()
 
 
-    def insert_values_apps(self, path, query):
+    def insert_values_main(self, path, query):
         try:
             # Connect to the PostgreSQL server
             self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
@@ -171,113 +171,3 @@ class DB_Handler():
             cols.append(elt[0])
 
         return pd.DataFrame(data=data, columns=cols)
-    
-    def test_query(self, table_name, limit=False):
-        try:
-            # Connect to the PostgreSQL server
-            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-            # Open a cursor to perform database operations
-            cur = conn.cursor()
-            # Execute a SELECT query on the table
-            if limit==True:
-                cur.execute(f"SELECT * FROM {table_name};")
-            else:
-                cur.execute(f"SELECT * FROM {table_name};")
-            rows = cur.fetchall()
-            # Print the rows returned by the query
-            for row in rows:
-                print(row)
-        except psycopg2.Error as e:
-            print("Error executing SELECT query:", e)
-        finally:
-            if conn is not None:
-                cur.close()
-                conn.close()
-    def test_query2(self, table_name, limit=False):
-        try:
-            # Connect to the PostgreSQL server
-            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-            # Open a cursor to perform database operations
-            cur = conn.cursor()
-            # Execute a SELECT query on the table
-            if limit==True:
-                cur.execute("""
-    SELECT "App ID" FROM apps WHERE name = '10 Best Foods for You';
-""")
-            else:
-                cur.execute(f"SELECT * FROM {table_name};")
-            rows = cur.fetchall()
-            # Print the rows returned by the query
-            for row in rows:
-                print(row)
-        except psycopg2.Error as e:
-            print("Error executing SELECT query:", e)
-        finally:
-            if conn is not None:
-                cur.close()
-                conn.close()
-db = DB_Handler('postgres', 'postgres', 'c', 'localhost', 'prova_db')
-
-# CATEGORY TABLE
-table_query = """
-    CREATE TABLE categories (
-        "Category ID" SERIAL PRIMARY KEY,
-        Name VARCHAR(256) NOT NULL
-    )
-"""
-db.create_table(table_query, 'categories')
-insert_query = """
-    INSERT INTO categories (Name)
-    SELECT %s
-    WHERE NOT EXISTS (
-        SELECT 1 FROM categories WHERE Name = %s
-    )
-"""
-db.insert_values_categories('./database/output/processed_googleplaystore.csv', insert_query)
-
-# APP TABLE
-# Define the table creation query
-table_query = """
-    CREATE TABLE apps (
-        "App ID" SERIAL PRIMARY KEY,
-        name VARCHAR(256) NOT NULL
-    )
-"""
-# Create the table
-db.create_table(table_query, 'apps')
-# Define the query for inserting data into the table
-insert_query = """
-    INSERT INTO apps (name)
-    SELECT %s
-    WHERE NOT EXISTS (
-        SELECT 1 FROM apps WHERE name = %s
-    )
-"""
-# Insert data from CSV file into the table
-db.app('./database/output/processed_googleplaystore.csv', insert_query)
-
-# APPS TABLE
-table_query = """
-    CREATE TABLE Main (
-    "Index" INT,
-    "App ID" INT REFERENCES apps("App ID"),
-    "Category ID" INT REFERENCES categories("Category ID"),
-    Rating VARCHAR(10),
-    Reviews VARCHAR(50),
-    Size VARCHAR(50),
-    Installs VARCHAR(50),
-    Type VARCHAR(10),
-    Price VARCHAR(50),
-    "Content Rating" VARCHAR(50),
-    Genres VARCHAR(50),
-    "Last Updated" VARCHAR(50),
-    "Age Restriction" VARCHAR(50)
-    )
-"""
-db.create_table(table_query, 'Main')
-query = """INSERT INTO Main (
-                "Index", "App ID", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
-                "Content Rating", Genres, "Last Updated", "Age Restriction") 
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-path = './database/output/processed_googleplaystore.csv'
-db.insert_values_apps(path, query)

@@ -3,6 +3,5 @@ numpy
 Afinn
 Pillow
 seaborn
-matplotlib.pyplot
+matplotlib
 psycopg2
-csv

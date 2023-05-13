@@ -28,6 +28,9 @@ class DataPreprocessor:
         df.drop(columns=['Current Ver', 'Android Ver'], inplace=True)
         self.transform_age(df, 'Content Rating')
         self.rename_categories(df)
+        self.comma_replacer(df, 'App')
+        self.quotatione_marks_replacer(df, 'App')
+        self.drop_duplicates(df, 'App')
         return df
     
     
@@ -156,6 +159,19 @@ class DataPreprocessor:
                                                                                                                 # - Drops the 'Unnamed: 0' column from the DataFrame
         df = df.drop(columns=['Unnamed: 0'])
 
-    def rename_categories(self, df):
-
+    def rename_categories(self, df):                                                                            #       Def Rename_Categories:
+                                                                                                                # - Rename Categories in a nicer fashion
         df['Category'] = df['Category'].str.replace('_', ' ').str.capitalize()
+
+    def comma_replacer(self, df, col):                                                                          #       Def Comma_Replacer:
+                                                                                                                # - Replace comma with empty string
+        df[col] = df[col].str.replace(',', '')
+
+    def quotatione_marks_replacer(self, df, col):                                                               #       Def quotatione_marks_replacer:
+                                                                                                                # - Replace quotation marks with empty string
+        df[col] = df[col].str.replace("'", '')
+        df[col] = df[col].str.replace('"', '')   
+
+    def drop_duplicates(self, df, col):
+
+        df = df.drop_duplicates(subset=col, keep='first')                                                    

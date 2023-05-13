@@ -32,7 +32,10 @@ class DataAnalyzer():
         df_reviews["sentiment score"] = pd.Series(score_list)
         
         df_sentiment = df_reviews.groupby("App")["sentiment score"].mean()
-   
+        
+        print(df.head(5))
+        print(df_sentiment.head(5))
+        
         df_all = df.merge(df_sentiment, on= "App")
         
         return df_reviews, df_sentiment, df_all

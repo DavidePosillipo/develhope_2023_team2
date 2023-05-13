@@ -2,8 +2,6 @@ pandas
 numpy
 Afinn
 Pillow
-os
-typing
 seaborn
 matplotlib.pyplot
 psycopg2

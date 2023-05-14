@@ -6,15 +6,43 @@ class DataAnalyzer():
     def __init__(self):
         pass
     
-    def pipeline(self, df, df_reviews, n_words, p_words):                                                  #      Def Pipeline:
-        return self.sentiment_score(df, df_reviews, n_words, p_words)                                      # - Runs DataAnalizer pipeline's methods 
+    def pipeline(self, df, df_reviews, n_words, p_words):  
+        """
+        Runs the DataAnalyzer pipeline to calculate sentiment scores and merge dataframes.
 
-    def sentiment_score(self, df, df_reviews, p_words, n_words):                                           #      Def Sentiment_Score:                                                                                                                                                         
-                                                                                                           # - Filters out rows with missing translated reviews
-        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)           # - Aggregates sentiment scores by App
-                                                                                                           # - Calculates sentiment scores for each review using Afinn
-        afinn = Afinn()                                                                                    # - Merges aggregated scores with the original DataFrame #
-                                                                                                           # - Returns the updated DataFrames
+        Args:
+            df (pd.DataFrame): The original dataframe.
+            df_reviews (pd.DataFrame): The dataframe containing reviews.
+            n_words (list): List of negative words.
+            p_words (list): List of positive words.
+
+        Returns:
+            tuple: A tuple containing the updated dataframes:
+                - df_reviews: The dataframe with sentiment scores.
+                - df_sentiment: The dataframe with aggregated sentiment scores by app.
+                - df_all: The merged dataframe of the original data and sentiment scores.
+        """                                                
+        return self.sentiment_score(df, df_reviews, n_words, p_words)                                     
+
+    def sentiment_score(self, df, df_reviews, p_words, n_words):                                           
+        """
+        Calculates sentiment scores for reviews and merges them with the original dataframe.
+
+        Args:
+            df (pd.DataFrame): The original dataframe.
+            df_reviews (pd.DataFrame): The dataframe containing reviews.
+            p_words (list): List of positive words.
+            n_words (list): List of negative words.
+
+        Returns:
+            tuple: A tuple containing the updated dataframes:
+                - df_reviews: The dataframe with sentiment scores.
+                - df_sentiment: The dataframe with aggregated sentiment scores by app.
+                - df_all: The merged dataframe of the original data and sentiment scores.
+        """                                                                                                   
+        df_reviews = df_reviews[~df_reviews["Translated_Review"].isna()].reset_index(drop= True)           
+                                                                                                           
+        afinn = Afinn()                                                                                    
         score_list = []
 
         for review in df_reviews["Translated_Review"]:

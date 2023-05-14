@@ -54,6 +54,7 @@ di.load_image('png', library='seaborn')
 
 db.run_data_pipeline()
 
-#!!! PAOLO !!!
 df = db.read_table('Main') 
-df.head(10)
+df_categories = db.read_table('categories')
+df_apps = db.read_table('apps')
+print(df.head(3), df_categories.head(3), df_apps.head(3))

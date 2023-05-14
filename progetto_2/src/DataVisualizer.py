@@ -50,10 +50,10 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")                                        
             self.growth_trend(df)
             self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
-            self.violin_plot(df,x='Category',y='Rating',hue='Type')
+            self.violin_plot(df, x='Category', y='Rating', hue='Type')
             self.box_plot(df,x='Category',y='Rating',hue='Type')
             self.stacked_bar(df)
+            self.sent_category_hbar(df_all)
 
         elif self.library == 'matplotlib':
             self.barh_by_grouping(df, column="Rating", group_by="Category", agg='sum')
@@ -66,10 +66,6 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")
             self.growth_trend(df)
             self.correlation_heatmap(df)
-            self.sent_category_hbar(df_all)
-
-    def save_png(self, title, xlabel, ylabel, path, bottom=None):
-        pass
 
     def barh_by_grouping(self, df, column, group_by, agg):
         """Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
@@ -480,6 +476,8 @@ class DataVisualizer:
             - The chart is created using either seaborn or matplotlib library, based on the selected library.
 
         """
+        fig, ax = plt.subplots()
+        df = df[['App', 'Category', 'Last Updated']]
         categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
         df_main = df[df['Category'].isin(categories)]
         df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
@@ -626,7 +624,7 @@ class DataVisualizer:
         if self.library == 'seaborn':
             plt.figure(figsize=(60, 20))
             plt.subplots_adjust(bottom=0.3)
-            sns.violinplot(x, y, hue, split=True, data=df, inner="quartile", linewidth=1)
+            sns.violinplot(data=df, x=x, y=y, hue=hue, split=True, inner="quartile", linewidth=1)
 
             plt.gca().set_xticklabels(plt.gca().get_xticklabels(), rotation=90)
 
@@ -657,7 +655,7 @@ class DataVisualizer:
         """
         plt.figure(figsize=(40, 20))
         plt.subplots_adjust(bottom=0.3)
-        sns.boxplot(x, y, hue, data=df)
+        sns.boxplot(data=df, x=x, y=y, hue=hue)
         plt.xticks(rotation=90)
         plt.title("Box plot average rating by category by type: Free-Paid")
         plt.xlabel(x)

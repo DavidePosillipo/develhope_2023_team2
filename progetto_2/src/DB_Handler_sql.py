@@ -25,7 +25,7 @@ class DB_Handler:
         print(f"Database '{database_name}' created.")
 
 # Instantiate the DB_Handler class with the database URL
-db_handler = DB_Handler('postgresql://username:password@host:port/postgres')
+db_handler = DB_Handler('postgresql://postgres:c@localhost:5432/postgres')
 
 # Create a new database named 'mydatabase'
-db_handler.create_database('mydatabase')
+db_handler.create_database('SQL_alchemy_db_prova')

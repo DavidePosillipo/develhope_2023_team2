@@ -4,13 +4,37 @@ import os
 from typing import Literal
 
 class DataIngestor:
+    """
+    A class that provides methods for loading and saving data files, loading specific columns of a file into a list,
+    and loading and displaying image files.
 
+    Methods:
+        load_file(path): Load a data file from the specified path.
+        save_file(df, path): Save a DataFrame to a file in the specified path.
+        load_to_list(path, col): Load a specific column of a data file into a list.
+        load_image(format, library): Load and display an image file.
+
+    Usage:
+        ingestor = DataIngestor()
+        data = ingestor.load_file('data.csv')
+        ingestor.save_file(data, 'data.pkl')
+        column_data = ingestor.load_to_list('data.xlsx', 2)
+        ingestor.load_image('png', 'seaborn')
+    """
     def __init__(self):
         pass
 
 
     def load_file(self, path):                                              
-         
+        """
+        Load a data file from the specified path.
+
+        Args:
+            path (str): The path of the file to load.
+
+        Returns:
+            pd.DataFrame: The loaded data as a DataFrame.
+        """ 
         format = path.rsplit(".")[1]
                                                                                     
         if format == 'pkl':                                                     
@@ -25,7 +49,16 @@ class DataIngestor:
         
         
     def save_file(self, df, path):                                          
-         
+        """
+        Save a DataFrame to a file in the specified path.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to save.
+            path (str): The path of the file to save.
+
+        Returns:
+            None.
+        """ 
         format = path.rsplit(".")[1] 
                                                                                     
         if format == 'pkl':                                                      
@@ -40,7 +73,16 @@ class DataIngestor:
         
         
     def load_to_list(self, path, col):                                     
-        
+        """
+        Load a specific column of a data file into a list.
+
+        Args:
+            path (str): The path of the file to load.
+            col (int): The index of the column to load.
+
+        Returns:
+            list: The specified column as a list.
+        """
         format = path.rsplit(".")[1] 
                                                                                     
         if format == 'pkl':                                                      
@@ -58,7 +100,16 @@ class DataIngestor:
         
         
     def load_image(self, format, library: Literal["seaborn", "matplotlib"]):     
-           
+        """
+        Load and display an image file.
+
+        Args:
+            format (str): The format of the image file.
+            library (Literal["seaborn", "matplotlib"]): The library to use for displaying the image.
+
+        Returns:
+            None.
+        """
         if format == 'png':                                                         
             directory = './database/output/graphs'                                  
             for filename in os.listdir(directory):                              

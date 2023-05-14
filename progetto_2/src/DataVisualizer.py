@@ -12,6 +12,21 @@ class DataVisualizer:
         style (Literal["darkgrid", "whitegrid", "dark", "white", "ticks", False], optional): The style of the plots. Defaults to False.
         show (bool, optional): Whether to display the plots. Defaults to True.
         save (bool, optional): Whether to save the plots. Defaults to False.
+
+    Methods:
+        pipeline: Executes a series of data visualization methods based on the selected library.
+        barh_by_grouping: Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
+        scatter_plot: Creates a scatter plot for two numerical columns in a dataframe.
+        countplot: Show the counts of observations in each categorical bin using bars.
+        grouped_rating: Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
+        popularity_score: Calculates the popularity score for each app in a dataframe based on its rating and number of installs, and creates a bar chart for the top apps by popularity score.
+        rating_counter: Creates a bar chart displaying the number of apps in each rating range, divided by a specified column.
+        growth_trend: Creates a line plot showing the growth of the number of apps by category over time.
+        correlation_heatmap: Creates a correlation heatmap based on the correlation matrix of the input DataFrame.
+        violin_plot: Creates a violin plot to visualize the distribution of app ratings by category and type.
+        box_plot: Creates a box plot to visualize the distribution of app ratings by category and type.
+        stacked_bar: Creates a stacked bar chart to visualize the number of apps by category and type.
+        sent_category_hbar: Creates a horizontal bar chart to visualize the average sentiment score per category.
     """
 
     def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False,

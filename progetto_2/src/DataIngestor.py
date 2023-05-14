@@ -9,12 +9,12 @@ class DataIngestor:
         pass
 
 
-    def load_file(self, path):                                              #     Def Load_File:
+    def load_file(self, path):                                              
          
         format = path.rsplit(".")[1]
-                                                                                    # - Reads a file from the specified path
-        if format == 'pkl':                                                      # - Supports loading files in 'pickle', 'csv', and 'xlsx' formats
-            return pd.read_pickle(path)                                             # - Returns a DataFrame or an error message for unsupported formats
+                                                                                    
+        if format == 'pkl':                                                     
+            return pd.read_pickle(path)                                             
         elif format == 'csv':                     
             return pd.read_csv(path)
         elif format == 'xlsx':
@@ -24,12 +24,12 @@ class DataIngestor:
         
         
         
-    def save_file(self, df, path):                                          # -     Def Save_File:
+    def save_file(self, df, path):                                          
          
         format = path.rsplit(".")[1] 
-                                                                                    # - Saves a DataFrame to the specified path 
-        if format == 'pkl':                                                      # - Supports saving files in 'pickle', 'csv', and 'xlsx' formats
-            return df.to_pickle(path)                                               # - Returns an error message for unsupported formats
+                                                                                    
+        if format == 'pkl':                                                      
+            return df.to_pickle(path)                                              
         elif format == 'csv':                     
             return df.to_csv(path)
         elif format == 'xlsx':
@@ -39,13 +39,13 @@ class DataIngestor:
         
         
         
-    def load_to_list(self, path, col):                                      #       Def Load_to_List:
+    def load_to_list(self, path, col):                                     
         
         format = path.rsplit(".")[1] 
-                                                                                    # - Reads a file from the specified path ('pickle', 'csv', and 'xlsx' formats)
-        if format == 'pkl':                                                      # - Extracts a specified column from the DataFrame
-            df = pd.read_pickle(path)                                               # - Returns the column values as a list
-            return df.iloc[:, col].tolist()                                        # - Returns an error message for unsupported formats
+                                                                                    
+        if format == 'pkl':                                                      
+            df = pd.read_pickle(path)                                               
+            return df.iloc[:, col].tolist()                                       
         elif format == 'csv':                                                       
             df = pd.read_csv(path)               
             return df.iloc[:, col].tolist()     
@@ -57,10 +57,10 @@ class DataIngestor:
         
         
         
-    def load_image(self, format, library: Literal["seaborn", "matplotlib"]):        #       Def Load_Image
-                                                                                    # - Loads and displays images from a specified directory
-        if format == 'png':                                                         # - Filters images (png format) based on the specified library
-            directory = './database/output/graphs'                                  # - Returns an error message for unsupported formats
+    def load_image(self, format, library: Literal["seaborn", "matplotlib"]):     
+           
+        if format == 'png':                                                         
+            directory = './database/output/graphs'                                  
             for filename in os.listdir(directory):                              
                 if library == 'seaborn' and 'sns' not in filename:
                     continue

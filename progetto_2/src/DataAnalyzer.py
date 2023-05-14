@@ -2,7 +2,16 @@ from afinn import Afinn
 import pandas as pd
 
 class DataAnalyzer():
+    """
+    DataAnalyzer class for performing sentiment analysis on app reviews.
 
+    Attributes:
+        None.
+
+    Methods:
+        pipeline: Runs the DataAnalyzer pipeline to calculate sentiment scores and merge dataframes.
+        sentiment_score: Calculates sentiment scores for reviews and merges them with the original dataframe.
+    """
     def __init__(self):
         pass
     

@@ -3,7 +3,33 @@ import numpy as np
 import pandas as pd
 
 class DataPreprocessor:
+    """
+    DataPreprocessor class for preprocessing dataframes.
 
+    Attributes:
+        None.
+
+    Methods:
+        pipeline: Preprocesses the given dataframe.
+        pipeline_reviews: Preprocesses the reviews dataframe.
+        drop_outdated: Drops outdated app entries from the dataframe.
+        item_to_bytes: Converts a string representation of a size to bytes.
+        to_bytes: Converts the size values in the specified column to bytes.
+        estimate_size: Estimates and replaces missing or 'Varies with device' size values.
+        genre_cleaning: Cleans up the 'Genres' column by keeping only the primary genre.
+        size_to_int: Converts the 'Size' column to integer type.
+        installs_cleaning: Cleans the 'Installs' column by converting it to integer type.
+        price: Cleans the 'Price' column by removing the dollar sign and converting it to float.
+        rating_fillna: Fills missing values in the 'Rating' column with the mean rating.
+        reviews_to_int: Converts the 'Reviews' column to integer values.
+        drop_na_values: Drops rows with missing values from the DataFrame.
+        transform_age: Transforms the 'Content Rating' column to an 'Age Restriction' column.
+        drop_unnamed: Drops the 'Unnamed: 0' column from the DataFrame.
+        rename_categories: Renames the categories in the 'Category' column.
+        comma_replacer: Replaces commas in a column with an empty string.
+        quotatione_marks_replacer: Replaces quotation marks in a column with an empty string.
+        drop_duplicates: Drops duplicate rows based on a specific column.
+    """
     def __init__(self):
         pass
 

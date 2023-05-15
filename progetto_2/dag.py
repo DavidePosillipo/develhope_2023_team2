@@ -21,26 +21,26 @@ default_args = {
     'catchup': False,
 }
 
-with DAG("project_dag", default_args=default_args) as dag:
+with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
     
     def data_processor():
 
-        df = di.load_file(path='./plugins/database/raw/googleplaystore.csv')
+        df = di.load_file(path='airflow/dags/database/raw/googleplaystore.csv')
         df = dp.pipeline(df)
-        di.save_file(df, 'database/output/processed_googleplaystore.csv')
+        di.save_file(df, 'airflow/dags/database/output/processed_googleplaystore.csv')
 
-        df_reviews = di.load_file(path='database/raw/googleplaystore_user_reviews.csv')
+        df_reviews = di.load_file(path='airflow/dags/database/raw/googleplaystore_user_reviews.csv')
         df_reviews = dp.pipeline_reviews(df_reviews) 
-        di.save_file(df_reviews, 'database/output/processed_reviews.csv')
+        di.save_file(df_reviews, 'airflow/dags/database/output/processed_reviews.csv')
 
     def data_analyzer():
 
-        '''df = di.load_file(path='./plugins/database/output/googleplaystore.csv')
-        df_reviews = di.load_file('database/output/processed_reviews.csv')
-        negative_words = di.load_to_list('database/raw/n.xlsx', col=0)
-        positive_words = di.load_to_list('database/raw/p.xlsx', col=0)
+        df = di.load_file(path='airflow/dags/database/output/processed_googleplaystore.csv')
+        df_reviews = di.load_file('airflow/dags/database/output/processed_reviews.csv')
+        negative_words = di.load_file('airflow/dags/database/raw/n.xlsx')
+        positive_words = di.load_file('airflow/dags/database/raw/p.xlsx')
         df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
-        di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')'''
+        di.save_file(df_all, 'airflow/dags/database/output/googleplaystore_sentiment.csv')
 
     def data_visualizer():
         '''df = dh.read_table('categories')
@@ -52,9 +52,14 @@ with DAG("project_dag", default_args=default_args) as dag:
         python_callable=data_processor,
     )
 
+    data_ananyzing_task = PythonOperator(
+        task_id='data_analyzer',
+        python_callable=data_analyzer
+    )
+
     data_visualization_task = PythonOperator(
         task_id='data_visualizer',
         python_callable=data_visualizer,
     )
 
-    data_processing_task 
+    data_processing_task >> data_ananyzing_task

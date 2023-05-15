@@ -14,7 +14,8 @@ di = DataIngestor()
 dp = DataPreprocessor()
 dv = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
 da = DataAnalyzer()  # Any list of words formatted in one column
-dh = DB_Handler(database= 'postgres', user='postgres', password='c', dbname='googleplaystore', cloud=True)
+#dh = DB_Handler(database = 'postgres', user = 'postgres', password='c', host='localhost', database_name = 'postgres')
+
 import pendulum
 
 @dag(
@@ -39,12 +40,35 @@ def prj2_main():
         Name VARCHAR(256) NOT NULL
         )"""
 
+        '''table_query = """
+        CREATE TABLE Main (
+        "Index" INT,
+        "App ID" INT REFERENCES apps("App ID"),
+        "Category ID" INT REFERENCES categories("Category ID"),
+        Rating VARCHAR(10),
+        Reviews VARCHAR(50),
+        Size VARCHAR(50),
+        Installs VARCHAR(50),
+        Type VARCHAR(10),
+        Price VARCHAR(50),
+        "Content Rating" VARCHAR(50),
+        Genres VARCHAR(50),
+        "Last Updated" VARCHAR(50),
+        "Age Restriction" VARCHAR(50)
+        )"""'''
+
         insert_categoryID_query = """
         INSERT INTO categories (Name)
         SELECT %s
         WHERE NOT EXISTS (
         SELECT 1 FROM categories WHERE Name = %s
         )"""
+
+        '''insert_values_query = """INSERT INTO Main (
+        Index, "App ID", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
+        "Content Rating", Genres, "Last Updated", "Age Restriction") 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """'''
         
         dh.create_table(table_query)
 

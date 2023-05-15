@@ -44,6 +44,9 @@ Follow these steps to get the project up and running on your local machine:
    Update the database connection details in the main.py file Line 13:
    db = DB_Handler(database = 'xxx', user = 'xxx', password='xxx', host='xxx', database_name = 'googleplaystore')
 
+   I suggest you use these inputs, just update the password with the one set up when installing Postgres:
+   db = DB_Handler(database = 'postgres', user = 'postgres', password='xxx', host='localhost', database_name = 'googleplaystore')
+
 5. Set up the Airflow connection:
 
    Create a new connection in Airflow using the connection details set for the PostgreSQL database.

@@ -4,7 +4,7 @@ import pandas as pd
 
 class DB_Handler:
     """A class for handling database operations."""
-    def __init__(self, database, user, password, host, database_name):
+    def __init__(self, database, user, password, host, port, database_name):
         """
         Initialize the DB_Handler object.
 
@@ -22,9 +22,10 @@ class DB_Handler:
         self.user = user
         self.password = password
         self.host = host
+        self.port = port
         self.database_name = database_name
         try:
-            self.conn = psycopg2.connect(database=database, user=user, password=password, host=host)
+            self.conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
             self.cur = self.conn.cursor()
             self.cur.execute("ROLLBACK")
             self.cur.execute(f"DROP DATABASE IF EXISTS {database_name};")
@@ -59,7 +60,7 @@ class DB_Handler:
                 SELECT 1 FROM categories WHERE Name = %s
             )
         """
-        self.insert_values_categories('./database/output/processed_googleplaystore.csv', categories_insert_query)
+        self.insert_values_categories('airflow/dags/database/output/processed_googleplaystore.csv', categories_insert_query)
         
         apps_table_query = """
             CREATE TABLE apps (
@@ -75,7 +76,7 @@ class DB_Handler:
                 SELECT 1 FROM apps WHERE name = %s
             )
         """
-        self.insert_values_apps('./database/output/processed_googleplaystore.csv', apps_insert_query)
+        self.insert_values_apps('airflow/dags/database/output/processed_googleplaystore.csv', apps_insert_query)
         
         main_table_query = """
             CREATE TABLE Main (
@@ -101,7 +102,7 @@ class DB_Handler:
                 "Content Rating", Genres, "Last Updated", "Age Restriction") 
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        self.insert_values_main('./database/output/processed_googleplaystore.csv', main_insert_query)
+        self.insert_values_main('airflow/dags/database/output/processed_googleplaystore.csv', main_insert_query)
 
     def create_table(self, query, table_name):
         """
@@ -115,7 +116,7 @@ class DB_Handler:
             psycopg2.Error: If there's an error creating the table.
         """
         try:
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
             self.cur = self.conn.cursor()
             self.cur.execute(f"DROP TABLE IF EXISTS {table_name};")
             self.cur.execute(query)
@@ -140,7 +141,7 @@ class DB_Handler:
             psycopg2.Error: If there's an error inserting the data.
         """
         try:
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
             self.cur = self.conn.cursor()
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
@@ -169,7 +170,7 @@ class DB_Handler:
             psycopg2.Error: If there's an error inserting the data.
         """
         try:
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
             self.cur = self.conn.cursor()
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
@@ -201,7 +202,7 @@ class DB_Handler:
             psycopg2.Error: If there's an error inserting the data.
         """
         try:
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
             self.cur = self.conn.cursor()
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
@@ -237,7 +238,7 @@ class DB_Handler:
             psycopg2.Error: If there's an error inserting the data.
         """
         try:
-            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
             self.cur = self.conn.cursor()
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)

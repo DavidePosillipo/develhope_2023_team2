@@ -1,0 +1,37 @@
+To resolve the issue and proceed with running Airflow in standalone mode, you can follow these steps:
+
+Make sure you have Python installed on your system. You can download the latest version of Python from the official website (https://www.python.org/downloads/).
+
+Create a virtual environment for Airflow. Open a terminal or command prompt and navigate to the desired directory. Then, run the following command:
+
+Copy code
+python -m venv airflow-env
+Activate the virtual environment. In the same terminal or command prompt, run the appropriate command based on your operating system:
+
+For Windows:
+Copy code
+airflow-env\Scripts\activate
+For macOS/Linux:
+bash
+Copy code
+source airflow-env/bin/activate
+Install Airflow and its dependencies. Run the following command:
+
+Copy code
+pip install apache-airflow
+Update SQLAlchemy to a version compatible with Airflow. Run the following command:
+
+arduino
+Copy code
+pip install "sqlalchemy<2.0"
+Initialize the Airflow database. Run the following command:
+
+csharp
+Copy code
+airflow db init
+Start the Airflow web server. Run the following command:
+
+css
+Copy code
+airflow webserver --port 8080
+At this point, the Airflow web server should be running on port 8080. You can access the Airflow UI by opening a web browser and navigating to http://localhost:8080.

@@ -34,9 +34,6 @@ class DataPreprocessor:
         pass
 
     def pipeline(self, df, copy: bool = False):
-<<<<<<< HEAD
-        df = df.drop(df[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame'].index)
-=======
         """
         Preprocesses the given dataframe.
 
@@ -47,9 +44,7 @@ class DataPreprocessor:
         Returns:
             pd.DataFrame: The preprocessed dataframe.
         """
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content Rating', 'Genres', 'Last Updated', 'Current Ver', 'Android Ver']] = np.NaN, 1.9, '19', '3.0M', '1,000+', 'Free', '0', 'Everyone', np.NaN, 'February 11, 2018', '1.0.19', '4.0 and up'
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Genres']] = 'LIFESTYLE', 'Lifestyle'
->>>>>>> develop
+        df = df.drop(df[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame'].index)
         if copy:
             df = df.copy()
         df['Last Updated'] = pd.to_datetime(df['Last Updated'])                                                 

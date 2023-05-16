@@ -39,18 +39,31 @@ Follow these steps to get the project up and running on your local machine:
     bash
     pip install -r requirements.txt
 
-4. Set up the PostgreSQL database:
+4. Start PostgreSQL
+
+   For wsl or Linux:
+   sudo service postgresql start
+
+   Windows:
+   Open the Start menu and search for "Services" or "Services.msc".
+   Open the "Services" application.
+   Scroll down and locate the PostgreSQL service in the list. The service name may vary depending on the version you have installed (e.g., "PostgreSQL Server", "postgresql-x64-13").
+   Right-click on the PostgreSQL service and select "Start" or "Restart" from the context menu.
+   Wait for the PostgreSQL service to start. You may see a status change or progress indicator in the Services application.
+   Once the PostgreSQL service has started successfully, you can proceed with your database operations or connect to the database using the appropriate client or tools.
+
+   Mac:
+   brew services start postgresql
+   
+5. Set up the PostgreSQL database:
 
    Update the database connection details in the main.py file Line 13:
    db = DB_Handler(database = 'xxx', user = 'xxx', password='xxx', host='xxx', database_name = 'googleplaystore')
 
    I suggest you use these inputs, just update the password with the one set up when installing Postgres:
-   db = DB_Handler(database = 'postgres', user = 'postgres', password='xxx', host='localhost', database_name = 'googleplaystore')
+   db = DB_Handler(database = 'postgres', user = 'postgres', password='xxx', host='localhost', port=543x, database_name = 'googleplaystore')
 
-5. Set up the Airflow connection:
+6. Set up the Airflow connection:
 
    Create a new connection in Airflow using the connection details set for the PostgreSQL database.
    You might have to adjust some parameters according to your machine and airflow setup.
-
-
-

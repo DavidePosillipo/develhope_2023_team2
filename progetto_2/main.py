@@ -9,6 +9,7 @@ from src.DB_Handler import DB_Handler
 di = DataIngestor()
 dp = DataPreprocessor()
 dv = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
+dv_matplotlib = DataVisualizer(library='matplotlib', style='darkgrid', show=False, save=True)
 da = DataAnalyzer()  # Any list of words formatted in one column
 db = DB_Handler(database = 'postgres', user = 'postgres', password='c', host='localhost', database_name = 'googleplaystore')
 
@@ -49,9 +50,10 @@ di.save_file(df_all, 'database/output/googleplaystore_sentiment.pkl')
 # Applies the data visualization pipeline (DataVisualizer)
 df_all = di.load_file('database/output/googleplaystore_sentiment.pkl')
 dv.pipeline(df, df_all)
+dv_matplotlib.pipeline(df, df_all)
 # Loads PNG graphs based on library
 di.load_image('png', library='seaborn')
-
+di.load_image('png', library='matplotlib')
 # CATEGORY TABLE
 table_query = """
     CREATE TABLE categories (

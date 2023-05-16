@@ -272,15 +272,15 @@ class DB_Handler:
             psycopg2.Error: If there's an error executing the SELECT query.
         """
         try:
-            conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host)
-            cur = conn.cursor()
-            cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
-            data = cur.fetchall()
+            self.conn = psycopg2.connect(database=self.database_name, user=self.user, password=self.password, host=self.host, port=self.port)
+            self.cur = self.conn.cursor()
+            self.cur.execute(f"SELECT * FROM {table_name} LIMIT 10;")
+            data = self.cur.fetchall()
         except psycopg2.Error as e:
             print("Error executing SELECT query:", e)
 
         cols = []
-        for elt in cur.description:
+        for elt in self.cur.description:
             cols.append(elt[0])
 
         return pd.DataFrame(data=data, columns=cols)

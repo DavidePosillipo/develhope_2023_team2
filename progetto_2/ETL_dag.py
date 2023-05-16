@@ -52,9 +52,9 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
 
     def db_handler():
         dh.run_data_pipeline()
-        df = db.read_table('Main') 
-        df_categories = db.read_table('categories')
-        df_apps = db.read_table('apps')
+        df = dh.read_table('Main') 
+        df_categories = dh.read_table('categories')
+        df_apps = dh.read_table('apps')
         print(df.head(3), df_categories.head(3), df_apps.head(3))
 
     data_processing_task = PythonOperator(

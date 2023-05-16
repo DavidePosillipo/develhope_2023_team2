@@ -1,6 +1,6 @@
-from src.DataIngestor_dag import DataIngestor
+from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
-from src.DataVisualizer_dag import DataVisualizer
+from src.DataVisualizer import DataVisualizer
 from src.DataAnalyzer import DataAnalyzer
 from src.DB_Handler import DB_Handler
 

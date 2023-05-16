@@ -14,7 +14,7 @@ dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, sav
 dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True)
 da = DataAnalyzer()
 dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434, database_name='googleplaystore')
-db_cloud = DB_Handler(database = 'xvglexze', user = 'xvglexze', password='zRNmK2sgNOUDF4aqfgPI-lyy59obRG2b', host='snuffleupagus.db.elephantsql.com', port=5432, database_name = 'googleplaystore')
+db_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432, database_name='yhpzbiwk')
 
 
 default_args = {
@@ -60,14 +60,20 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         print(df.head(3), df_categories.head(3), df_apps.head(3))
     
     def db_cloud():
-        pass
+        dh_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432, database_name='yhpzbiwk')
+        dh_cloud.run_data_pipeline()
+        df = dh_cloud.read_table('Main') 
+        df_categories = dh_cloud.read_table('categories')
+        df_apps = dh_cloud.read_table('apps')
+        print(df.head(3), df_categories.head(3), df_apps.head(3))
+
 
     data_processing_task = PythonOperator(
         task_id='data_processor',
         python_callable=data_processor,
     )
 
-    data_ananyzing_task = PythonOperator(
+    data_analyzing_task = PythonOperator(
         task_id='data_analyzer',
         python_callable=data_analyzer
     )
@@ -85,4 +91,5 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         task_id='db_cloud',
         python_callable=db_cloud,
     )
-    data_processing_task >> [data_ananyzing_task, db_handler_task] >> [data_visualization_task, db_cloud] 
+    
+    data_processing_task >> data_analyzing_task >> data_visualization_task >> db_handler_task >> db_cloud_task

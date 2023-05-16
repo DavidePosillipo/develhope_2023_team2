@@ -1,6 +1,6 @@
 from src.DataIngestor import DataIngestor
 from src.DataPreprocessor import DataPreprocessor
-from src.DataVisualizer import DataVisualizer
+from src.DataVisualizer_dag import DataVisualizer
 from src.DataAnalyzer import DataAnalyzer
 from src.DataIngestor import DataIngestor
 from src.DB_Handler import DB_Handler
@@ -11,7 +11,8 @@ from datetime import datetime
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
+dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
+dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True)
 da = DataAnalyzer()
 #dh = DB_Handler(database='postgres', user='postgres', password='c', host='5434', database_name='googleplaystore')
 
@@ -43,9 +44,12 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         di.save_file(df_all, 'airflow/dags/database/output/googleplaystore_sentiment.csv')
 
     def data_visualizer():
-        '''df = dh.read_table('categories')
-        df_all = dh.read_table('categories')
-        dv.pipeline()'''
+        df = di.load_file(path='airflow/dags/database/output/processed_googleplaystore.csv')
+        df_all = di.load_file('airflow/dags/database/output/googleplaystore_sentiment.csv')
+        dv_seaborn.pipeline(df, df_all)
+        dv_matplotlib.pipeline(df, df_all)
+        di.load_image('png', library='seaborn')
+        di.load_file('png', library='matplotlib')
 
     data_processing_task = PythonOperator(
         task_id='data_processor',
@@ -62,4 +66,4 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         python_callable=data_visualizer,
     )
 
-    data_processing_task >> data_ananyzing_task
+    data_processing_task >> data_ananyzing_task >> data_visualization_task

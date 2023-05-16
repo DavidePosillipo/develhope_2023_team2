@@ -4,7 +4,7 @@ import pandas as pd
 
 class DB_Handler:
     """A class for handling database operations."""
-    def __init__(self, database, user, password, host, port, database_name):
+    def __init__(self, database, user, password, host, port, database_name, cloud):
         """
         Initialize the DB_Handler object.
 
@@ -24,6 +24,7 @@ class DB_Handler:
         self.host = host
         self.port = port
         self.database_name = database_name
+
         try:
             self.conn = psycopg2.connect(database=database, user=user, password=password, host=host, port=port)
             self.cur = self.conn.cursor()

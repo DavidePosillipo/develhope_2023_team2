@@ -14,6 +14,8 @@ dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, sav
 dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True)
 da = DataAnalyzer()
 dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434, database_name='googleplaystore')
+db_cloud = DB_Handler(database = 'xvglexze', user = 'xvglexze', password='zRNmK2sgNOUDF4aqfgPI-lyy59obRG2b', host='snuffleupagus.db.elephantsql.com', port=5432, database_name = 'googleplaystore')
+
 
 default_args = {
     'start_date': datetime(2023, 4, 28),
@@ -56,6 +58,9 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         df_categories = dh.read_table('categories')
         df_apps = dh.read_table('apps')
         print(df.head(3), df_categories.head(3), df_apps.head(3))
+    
+    def db_cloud():
+        pass
 
     data_processing_task = PythonOperator(
         task_id='data_processor',
@@ -76,4 +81,8 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         task_id='db_handler',
         python_callable=db_handler,
     )
-    data_processing_task >> data_ananyzing_task >> data_visualization_task >> db_handler_task
+    db_cloud_task = PythonOperator(
+        task_id='db_cloud',
+        python_callable=db_cloud,
+    )
+    data_processing_task >> [data_ananyzing_task, db_handler_task] >> [data_visualization_task, db_cloud] 

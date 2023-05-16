@@ -11,7 +11,9 @@ dp = DataPreprocessor()
 dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
 dv_matplotlib = DataVisualizer(library='matplotlib', style='darkgrid', show=False, save=True)
 da = DataAnalyzer()  # Any list of words formatted in one column
-db = DB_Handler(database = 'postgres', user = 'postgres', password='c', host='localhost', database_name = 'googleplaystore')
+db = DB_Handler(database = 'postgres', user = 'postgres', password='c', host='localhost', port=5432, database_name = 'googleplaystore')
+db_cloud = DB_Handler(database = 'xvglexze', user = 'xvglexze', password='zRNmK2sgNOUDF4aqfgPI-lyy59obRG2b', host='snuffleupagus.db.elephantsql.com', port=5432, database_name = 'googleplaystore')
+
 
 # Uploads csv file containing data about Google Play Store apps
 df = di.load_file('database/raw/googleplaystore.csv')

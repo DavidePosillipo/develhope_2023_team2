@@ -49,7 +49,7 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         dv_seaborn.pipeline(df, df_all)
         dv_matplotlib.pipeline(df, df_all)
         di.load_image('png', library='seaborn')
-        di.load_file('png', library='matplotlib')
+        di.load_image('png', library='matplotlib')
 
     data_processing_task = PythonOperator(
         task_id='data_processor',

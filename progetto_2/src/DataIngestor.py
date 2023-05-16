@@ -111,7 +111,7 @@ class DataIngestor:
             None.
         """
         if format == 'png':                                                         
-            directory = './database/output/graphs'                                  
+            directory = 'airflow/dags/database/output/graphs'                                  
             for filename in os.listdir(directory):                              
                 if library == 'seaborn' and 'sns' not in filename:
                     continue

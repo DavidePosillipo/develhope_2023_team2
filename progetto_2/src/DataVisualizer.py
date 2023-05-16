@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
 
 class DataVisualizer:
     """A class for visualizing data using either seaborn or matplotlib library.
@@ -187,7 +189,7 @@ class DataVisualizer:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
                 else:
-                    data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
+                    data = df.groupby(by=[var, hue])[[var, hue]].size().unstack(fill_value=0)
                     data = data.sort_values(by=list(data.columns)[0])
 
                     y = np.arange(len(data.index))
@@ -496,11 +498,11 @@ class DataVisualizer:
         df = df[['App', 'Category', 'Last Updated']]
         categories = ['Entertainment', 'Business', 'Family', 'Finance', 'Productivity']
         df_main = df[df['Category'].isin(categories)]
-        df_main.loc[:, 'Last Updated'] = pd.to_datetime(df['Last Updated'])
+        df_main['Last Updated'] = pd.to_datetime(df['Last Updated'])
         grouped = df_main.groupby([df_main['Last Updated'].dt.year, 'Category'])['Category'].count()
         trend = grouped.unstack(level=1, fill_value=0)
         df_else = df[~df['Category'].isin(categories)]
-        df_else.loc[:, 'Last Updated'] = pd.to_datetime(df_else['Last Updated'])
+        df_else['Last Updated'] = pd.to_datetime(df_else['Last Updated'])
         grouped_else = df_else.groupby([df_else['Last Updated'].dt.year, 'Category'])['Category'].count()
         trend_else = grouped_else.unstack(level=1, fill_value=0)
         trend_else_mean = trend_else.mean(axis=1)
@@ -539,7 +541,12 @@ class DataVisualizer:
             - The chart is created using either seaborn or matplotlib library, based on the selected library.
 
         """
-        std_df = df.corr()
+        # Exclude columns with non-numeric values
+        numeric_columns = df.select_dtypes(include=[np.number]).columns
+        df_numeric = df[numeric_columns]
+
+        # Calculate correlation matrix
+        std_df = df_numeric.corr()
         std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
         
         if self.library=='seaborn':

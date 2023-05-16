@@ -2,10 +2,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
-import pandas as pdimport seaborn as sns
-import matplotlib.pyplot as plt
-from typing import Literal
-import numpy as np
 import pandas as pd
 
 class DataVisualizer:

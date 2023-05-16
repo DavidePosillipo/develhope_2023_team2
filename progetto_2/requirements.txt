@@ -4,5 +4,9 @@ Afinn
 Pillow
 seaborn
 matplotlib
+<<<<<<< HEAD
 psycopg2
 openpyxl
+=======
+psycopg2
+>>>>>>> develop

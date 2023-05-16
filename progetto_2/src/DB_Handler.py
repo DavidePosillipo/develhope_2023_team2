@@ -38,6 +38,71 @@ class DB_Handler:
                 self.cur.close()
                 self.conn.close()
 
+    def run_data_pipeline(self):
+        """
+        Execute the data pipeline to create tables and insert values.
+
+        Raises:
+            psycopg2.Error: If there's an error creating tables or inserting values.
+        """
+        categories_table_query = """
+            CREATE TABLE categories (
+                "Category ID" SERIAL PRIMARY KEY,
+                Name VARCHAR(256) NOT NULL
+            )
+        """
+        self.create_table(categories_table_query, 'categories')
+        categories_insert_query = """
+            INSERT INTO categories (Name)
+            SELECT %s
+            WHERE NOT EXISTS (
+                SELECT 1 FROM categories WHERE Name = %s
+            )
+        """
+        self.insert_values_categories('./database/output/processed_googleplaystore.csv', categories_insert_query)
+        
+        apps_table_query = """
+            CREATE TABLE apps (
+                "App ID" SERIAL PRIMARY KEY,
+                name VARCHAR(256) NOT NULL
+            )
+        """
+        self.create_table(apps_table_query, 'apps')
+        apps_insert_query = """
+            INSERT INTO apps (name)
+            SELECT %s
+            WHERE NOT EXISTS (
+                SELECT 1 FROM apps WHERE name = %s
+            )
+        """
+        self.insert_values_apps('./database/output/processed_googleplaystore.csv', apps_insert_query)
+        
+        main_table_query = """
+            CREATE TABLE Main (
+                "Index" INT,
+                "App ID" INT REFERENCES apps("App ID"),
+                "Category ID" INT REFERENCES categories("Category ID"),
+                Rating VARCHAR(10),
+                Reviews VARCHAR(50),
+                Size VARCHAR(50),
+                Installs VARCHAR(50),
+                Type VARCHAR(10),
+                Price VARCHAR(50),
+                "Content Rating" VARCHAR(50),
+                Genres VARCHAR(50),
+                "Last Updated" VARCHAR(50),
+                "Age Restriction" VARCHAR(50)
+            )
+        """
+        self.create_table(main_table_query, 'Main')
+        main_insert_query = """
+            INSERT INTO Main (
+                "Index", "App ID", "Category ID", Rating, Reviews, Size, Installs, Type, Price, 
+                "Content Rating", Genres, "Last Updated", "Age Restriction") 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        self.insert_values_main('./database/output/processed_googleplaystore.csv', main_insert_query)
+
     def create_table(self, query, table_name):
         """
         Create a table in the database.

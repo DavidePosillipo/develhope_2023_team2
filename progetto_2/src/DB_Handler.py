@@ -30,7 +30,7 @@ class DB_Handler:
             self.cur.execute(f"DROP DATABASE IF EXISTS {database_name};")
             self.cur.execute(f"CREATE DATABASE {database_name};")
             self.conn.commit()
-            print("Database created successfully")
+            print("Local Database created successfully")
         except psycopg2.Error as e:
             print("Error creating database:", e)
         finally:

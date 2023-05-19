@@ -99,7 +99,7 @@ class DataIngestor:
         
         
         
-    def load_image(self, format, library: Literal["seaborn", "matplotlib"]):     
+    def load_image(self, format, path, library: Literal["seaborn", "matplotlib"]):     
         """
         Load and display an image file.
 
@@ -110,16 +110,16 @@ class DataIngestor:
         Returns:
             None.
         """
-        if format == 'png':                                                         
-            directory = './database/output/graphs'                                  
-            for filename in os.listdir(directory):                              
+        if format == 'png':                                   
+            for filename in os.listdir(path):                              
                 if library == 'seaborn' and 'sns' not in filename:
                     continue
                 if library == 'matplotlib' and 'mat' not in filename:
                     continue
             
-                filepath = os.path.join(directory, filename)
+                filepath = os.path.join(path, filename)
                 img = Image.open(filepath)
                 img.show()
         else:
             return 'Apologies, but this format has not been implemented yet.'
+    

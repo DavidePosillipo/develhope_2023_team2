@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 
 class DataVisualizer:
     """A class for visualizing data using either seaborn or matplotlib library.
@@ -81,6 +84,7 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")
             self.growth_trend(df)
             self.correlation_heatmap(df)
+            self.sent_category_hbar(df_all)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         """Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
@@ -186,7 +190,7 @@ class DataVisualizer:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
                 else:
-                    data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
+                    data = df.groupby(by=[var, hue])[[var, hue]].size().unstack(fill_value=0)
                     data = data.sort_values(by=list(data.columns)[0])
 
                     y = np.arange(len(data.index))
@@ -538,7 +542,12 @@ class DataVisualizer:
             - The chart is created using either seaborn or matplotlib library, based on the selected library.
 
         """
-        std_df = df.corr()
+        # Exclude columns with non-numeric values
+        numeric_columns = df.select_dtypes(include=[np.number]).columns
+        df_numeric = df[numeric_columns]
+
+        # Calculate correlation matrix
+        std_df = df_numeric.corr()
         std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
         
         if self.library=='seaborn':
@@ -676,6 +685,10 @@ class DataVisualizer:
         plt.xlabel(x)
         plt.ylabel(y)
         plt.show()
+        if self.save:
+            plt.savefig('./database/output/graphs/Box_plot_average_rating_by_category_by_type_:_Free-Paid.png')
+        if self.show:
+            plt.show()
 
 
     def stacked_bar(self, df):

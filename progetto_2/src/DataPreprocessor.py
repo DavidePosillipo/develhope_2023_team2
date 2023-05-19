@@ -3,17 +3,52 @@ import numpy as np
 import pandas as pd
 
 class DataPreprocessor:
+    """
+    DataPreprocessor class for preprocessing dataframes.
 
+    Attributes:
+        None.
+
+    Methods:
+        pipeline: Preprocesses the given dataframe.
+        pipeline_reviews: Preprocesses the reviews dataframe.
+        drop_outdated: Drops outdated app entries from the dataframe.
+        item_to_bytes: Converts a string representation of a size to bytes.
+        to_bytes: Converts the size values in the specified column to bytes.
+        estimate_size: Estimates and replaces missing or 'Varies with device' size values.
+        genre_cleaning: Cleans up the 'Genres' column by keeping only the primary genre.
+        size_to_int: Converts the 'Size' column to integer type.
+        installs_cleaning: Cleans the 'Installs' column by converting it to integer type.
+        price: Cleans the 'Price' column by removing the dollar sign and converting it to float.
+        rating_fillna: Fills missing values in the 'Rating' column with the mean rating.
+        reviews_to_int: Converts the 'Reviews' column to integer values.
+        drop_na_values: Drops rows with missing values from the DataFrame.
+        transform_age: Transforms the 'Content Rating' column to an 'Age Restriction' column.
+        drop_unnamed: Drops the 'Unnamed: 0' column from the DataFrame.
+        rename_categories: Renames the categories in the 'Category' column.
+        comma_replacer: Replaces commas in a column with an empty string.
+        quotatione_marks_replacer: Replaces quotation marks in a column with an empty string.
+        drop_duplicates: Drops duplicate rows based on a specific column.
+    """
     def __init__(self):
         pass
 
     def pipeline(self, df, copy: bool = False):
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Rating', 'Reviews', 'Size', 'Installs', 'Type', 'Price', 'Content Rating', 'Genres', 'Last Updated', 'Current Ver', 'Android Ver']] = np.NaN, 1.9, '19', '3.0M', '1,000+', 'Free', '0', 'Everyone', np.NaN, 'February 11, 2018', '1.0.19', '4.0 and up'
-        df.loc[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame', ['Category', 'Genres']] = 'LIFESTYLE', 'Lifestyle'
+        """
+        Preprocesses the given dataframe.
+
+        Args:
+            df (pd.DataFrame): The input dataframe.
+            copy (bool): Flag indicating whether to create a copy of the dataframe (default: False).
+
+        Returns:
+            pd.DataFrame: The preprocessed dataframe.
+        """
+        df = df.drop(df[df['App'] == 'Life Made WI-Fi Touchscreen Photo Frame'].index)
         if copy:
             df = df.copy()
-        df['Last Updated'] = pd.to_datetime(df['Last Updated'])                                                 #       Def Pipeline:
-        self.drop_outdated(df)                                                                                  # - - Runs DataPreprocessor pipeline's methods
+        df['Last Updated'] = pd.to_datetime(df['Last Updated'])                                                 
+        self.drop_outdated(df)                                                                                  
         df['Category'] = pd.Categorical(df['Category'])
         self.to_bytes(df, 'Size')
         self.estimate_size(df)
@@ -33,18 +68,32 @@ class DataPreprocessor:
         self.drop_duplicates(df, 'App')
         return df
     
-    
-    def pipeline_reviews(self, df):                                                                             #       Def Pipeline_Reviews:
-        df = df.dropna()                                                                                        # - Drops rows with missing values
-        df = df[['App', 'Translated_Review']]                                                                   # - Selects 'App' and 'Translated_Review' columns
-        return df                                                                                               # - Returns the updated DataFrame
-    
 
-    
-    def drop_outdated(self, df):                                                                                #       Def Drop_Outdated:
-                                                                                                                # - Sorts the DataFrame by 'Last Updated'
-        df.sort_values(by='Last Updated', inplace=True)                                                         # - Drops duplicate entries, keeping the most recent one
-                                                                                                                # - Ignores 'Reviews', 'Category', and 'Last Updated'
+    def pipeline_reviews(self, df):     
+        """
+        Preprocesses the reviews dataframe.
+
+        Args:
+            df (pd.DataFrame): The input reviews dataframe.
+
+        Returns:
+            pd.DataFrame: The preprocessed reviews dataframe.
+        """                                                                        
+        df = df.dropna()                                                                                        
+        df = df[['App', 'Translated_Review']]                                                                   
+        return df                                                                                               
+      
+    def drop_outdated(self, df):   
+        """
+        Drops outdated app entries from the dataframe.
+
+        Args:
+            df (pd.DataFrame): The input dataframe.
+
+        Returns:
+            None. The dataframe is modified in-place.
+        """                                                                                   
+        df.sort_values(by='Last Updated', inplace=True)                                                         
         df.drop_duplicates(
             subset = ['App', 'Rating', 'Size', 'Installs', 'Type',
                 'Price', 'Content Rating', 'Genres', 'Current Ver',
@@ -52,11 +101,18 @@ class DataPreprocessor:
             keep = 'last', 
             inplace = True)
         
+    def item_to_bytes(self, item):    
+        """
+        Converts a string representation of a size to bytes.
 
+        Args:
+            item (str): The input size value.
 
-    def item_to_bytes(self, item):                                                                              #       Def Item_To_Bytes:
-                                                                                                                # - Converts an item to bytes based on its unit (kB, MB) using the function To_Bytes
-        if item.isdigit():                                                                                      # - Returns the converted value or the original item if not a size unit
+        Returns:
+            int or str: The size converted to bytes if it can be converted,
+                otherwise the original value is returned as is.
+        """                                                                          
+        if item.isdigit():                                                                                     
             return int(item)
         elif item[-1] == 'k':
             return int(float(item[:-1]) * 1_024) 
@@ -65,17 +121,30 @@ class DataPreprocessor:
         else:
             return item
 
+    def to_bytes(self, df, column):   
+        """
+        Convert the size values in the specified column to bytes.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+            column (str): The name of the column containing the size values.
 
-    def to_bytes(self, df, column):                                                                             #       Def To_Bytes
-                                                                                                                # - Applies the 'item_to_bytes' function to the specified column
-        df[column] = df[column].apply(self.item_to_bytes)                                                       # - Updates the DataFrame with the converted values
+        Returns:
+            None. The conversion is applied directly to the DataFrame.
+        """                                                                          
+        df[column] = df[column].apply(self.item_to_bytes)                                                       
 
+    def estimate_size(self, df):                                                                                                            
+        """
+        Estimate and replace missing or 'Varies with device' size values with the mean size per category.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def estimate_size(self, df):                                                                                                            #       Def Estimate Size                                                                                                                                   
-                                                                                                                                            # - Estimates the average size for each category
-        categories_mean_size = {}                                                                                                           # - Fills missing size values with the category average
+        Returns:
+            None. The size values are updated directly in the DataFrame.
+        """
+        categories_mean_size = {}                                                                                                           
 
         for category in df['Category'].unique():
             category_mean = df.loc[(df['Category'] == category) & (df['Size'] != 'Varies with device'), 'Size'].mean()
@@ -85,42 +154,78 @@ class DataPreprocessor:
             df.loc[(df['Category'] == category) & (df['Size'] == 'Varies with device'), 'Size'] = categories_mean_size[category]
             df.loc[df['Size'].isna(), 'Size'] = categories_mean_size[category]
 
+    def genre_cleaning(self, df):     
+        """
+        Clean up the 'Genres' column by keeping only the primary genre.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def genre_cleaning(self, df):                                                                               #       Def Genre_Cleaning
-                                                                                                                # - Cleans the 'Genres' column by keeping only the first genre if multiple are present
+        Returns:
+            None. The 'Genres' column is updated directly in the DataFrame.
+        """                                                                          
         df['Genres'] = df['Genres'].str.split(';', expand=True)[0]                                              
 
+    def size_to_int(self, df):  
+        """
+        Convert the 'Size' column to integer type.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def size_to_int(self, df):                                                                                  #       Def Size_to_Int
-                                                                                                                # - Converts 'Size' column to integer type.                                                                   
+        Returns:
+            None. The 'Size' column is updated directly in the DataFrame.
+        """                                                                                
         df['Size'] = df['Size'].astype('Int32')
 
+    def installs_cleaning(self, df):    
+        """
+        Clean the 'Installs' column by converting it to integer type.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def installs_cleaning(self, df):                                                                                                        #       Def Installs_Cleaning:
-                                                                                                                                            # - Cleans the 'Installs' column by extracting numerical values
-        df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)                  # - Converts the column to an integer data type
+        Returns:
+            None. The 'Installs' column is updated directly in the DataFrame.
+        """                                                                                                    
+        df['Installs'] = df['Installs'].astype('str').str.extractall('(\d+)').unstack().fillna('').sum(axis=1).astype(int)                 
         
+    def price(self, df):           
+        """
+        Clean the 'Price' column by removing the dollar sign and converting it to float.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def price(self, df):                                                                                        #       Def Price:
-                                                                                                                # - Removes the '$' sign from the 'Price' column
-        df['Price'] = np.array([value.replace('$', '') for value in df['Price']]).astype(float)                 # - Converts the column to a float data type
-        
- 
+        Returns:
+            None. The 'Price' column is updated directly in the DataFrame.
+        """                                                                             
+        df['Price'] = np.array([value.replace('$', '') for value in df['Price']]).astype(float)                 
 
-    def rating_fillna(self, df):                                                                                #       Def Rating_Fillna:
-                                                                                                                # - Replaces NaN values in the 'Rating' column with the mean rating         
+    def rating_fillna(self, df):    
+        """
+        Fill missing values in the 'Rating' column with the mean rating.
+
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+
+        Returns:
+            None. The missing values in the 'Rating' column are filled in-place with the mean rating.
+        """                                                                            
         mean = round(df['Rating'].dropna().mean(), 1)                                                           
         df['Rating'].fillna(mean, inplace=True)
-        
 
+    def reviews_to_int(self, df):    
+        """
+        Convert the 'Reviews' column to integer values.
 
-    def reviews_to_int(self, df):                                                                               #       Def Reviews_to_Int:
-                                                                                                                # - Converts the 'Reviews' column to an integer data type
-        n=0                                                                                                     # - Handles non-integer values gracefully
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+
+        Returns:
+            None. The 'Reviews' column is converted to integer values in-place.
+        """                                                                           
+        n=0                                                                                                     
         except_ls=[]
         for i in df['Reviews']:
             try:
@@ -131,19 +236,32 @@ class DataPreprocessor:
             n+=1
         df['Reviews']=df['Reviews'].astype({'Reviews':'Int32'}, copy=False)
         
+    def drop_na_values(self, df):    
+        """
+        Drop rows with missing values from the DataFrame.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
 
-    def drop_na_values(self, df):                                                                               #       Def Drop_na_Values:                                                                           
-                                                                                                                # - Drops any remaining rows with NaN values
+        Returns:
+            None. Rows with missing values are dropped from the DataFrame in-place.
+        """                                                                           
         if df.isna().sum().any()>0:
             df.dropna(inplace=True)
 
+    def transform_age(self, df, column):   
+        """
+        Transform the 'Content Rating' column to an 'Age Restriction' column.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+            column (str): The name of the 'Content Rating' column.
 
-    def transform_age(self, df, column):                                                                        #       Def Transform_Age:     
-                                                                                                                # - Maps age restriction strings to corresponding integer values
-        age_map = {                                                                                             # - Creates a new 'Age Restriction' column with the mapped values
-            "Everyone" : 0,                                                                                     # - Updates 'Content Rating' for 'Unrated' entries to 'Everyone'
+        Returns:
+            None. The 'Content Rating' column is transformed to an 'Age Restriction' column in-place.
+        """                                                                     
+        age_map = {                                                                                             
+            "Everyone" : 0,                                                                                     
             "Everyone 10+": 10,
             "Teen": 13,
             "Mature 17+": 17,
@@ -152,26 +270,67 @@ class DataPreprocessor:
         }
         df['Age Restriction'] = df[column].map(age_map).fillna(0).astype(int)
         df.loc[df['Content Rating'] == 'Unrated', 'Content Rating'] = 'Everyone'
-    
+       
+    def drop_unnamed(self, df):      
+        """
+        Drop the 'Unnamed: 0' column from the DataFrame.
 
-    
-    def drop_unnamed(self, df):                                                                                 #       Def Drop_Unnamed:
-                                                                                                                # - Drops the 'Unnamed: 0' column from the DataFrame
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+
+        Returns:
+            None. The 'Unnamed: 0' column is dropped from the DataFrame in-place.
+        """                                                                           
         df = df.drop(columns=['Unnamed: 0'])
 
-    def rename_categories(self, df):                                                                            #       Def Rename_Categories:
-                                                                                                                # - Rename Categories in a nicer fashion
+    def rename_categories(self, df): 
+        """
+        Rename the categories in the 'Category' column.
+
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+
+        Returns:
+            None. The categories in the 'Category' column are renamed in-place.
+        """                                                                           
         df['Category'] = df['Category'].str.replace('_', ' ').str.capitalize()
 
-    def comma_replacer(self, df, col):                                                                          #       Def Comma_Replacer:
-                                                                                                                # - Replace comma with empty string
+    def comma_replacer(self, df, col):  
+        """
+        Replace commas in a column with an empty string.
+
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+            col (str): The name of the column.
+
+        Returns:
+            None. Commas in the specified column are replaced with an empty string in-place.
+        """                                                                        
         df[col] = df[col].str.replace(',', '')
 
-    def quotatione_marks_replacer(self, df, col):                                                               #       Def quotatione_marks_replacer:
-                                                                                                                # - Replace quotation marks with empty string
+    def quotatione_marks_replacer(self, df, col):  
+        """
+        Replace quotation marks in a column with an empty string.
+
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+            col (str): The name of the column.
+
+        Returns:
+            None. Quotation marks in the specified column are replaced with an empty string in-place.
+        """                                                             
         df[col] = df[col].str.replace("'", '')
         df[col] = df[col].str.replace('"', '')   
 
     def drop_duplicates(self, df, col):
+        """
+        Drop duplicate rows based on a specific column.
 
+        Args:
+            df (pandas.DataFrame): The DataFrame containing the data.
+            col (str): The name of the column used to identify duplicates.
+
+        Returns:
+            None. Duplicate rows based on the specified column are dropped from the DataFrame in-place.
+        """
         df = df.drop_duplicates(subset=col, keep='first')                                                    

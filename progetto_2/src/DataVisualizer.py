@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from typing import Literal
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+matplotlib.use('TkAgg')
 
 class DataVisualizer:
     """A class for visualizing data using either seaborn or matplotlib library.
@@ -12,6 +15,21 @@ class DataVisualizer:
         style (Literal["darkgrid", "whitegrid", "dark", "white", "ticks", False], optional): The style of the plots. Defaults to False.
         show (bool, optional): Whether to display the plots. Defaults to True.
         save (bool, optional): Whether to save the plots. Defaults to False.
+
+    Methods:
+        pipeline: Executes a series of data visualization methods based on the selected library.
+        barh_by_grouping: Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
+        scatter_plot: Creates a scatter plot for two numerical columns in a dataframe.
+        countplot: Show the counts of observations in each categorical bin using bars.
+        grouped_rating: Creates a bar chart for the mean, maximum, and minimum rating of a column in a dataframe grouped by another column.
+        popularity_score: Calculates the popularity score for each app in a dataframe based on its rating and number of installs, and creates a bar chart for the top apps by popularity score.
+        rating_counter: Creates a bar chart displaying the number of apps in each rating range, divided by a specified column.
+        growth_trend: Creates a line plot showing the growth of the number of apps by category over time.
+        correlation_heatmap: Creates a correlation heatmap based on the correlation matrix of the input DataFrame.
+        violin_plot: Creates a violin plot to visualize the distribution of app ratings by category and type.
+        box_plot: Creates a box plot to visualize the distribution of app ratings by category and type.
+        stacked_bar: Creates a stacked bar chart to visualize the number of apps by category and type.
+        sent_category_hbar: Creates a horizontal bar chart to visualize the average sentiment score per category.
     """
 
     def __init__(self, library: Literal["seaborn", "matplotlib"] = 'seaborn', style: Literal["darkgrid","whitegrid","dark","white","ticks",False] = False,
@@ -66,6 +84,7 @@ class DataVisualizer:
             self.rating_counter(df, "Rating", "Type")
             self.growth_trend(df)
             self.correlation_heatmap(df)
+            self.sent_category_hbar(df_all)
 
     def barh_by_grouping(self, df, column, group_by, agg):
         """Creates a horizonatal bar chart with aggregation function (parameter=agg) on a numerical column grouped by a categorical column.
@@ -171,7 +190,7 @@ class DataVisualizer:
                 if self.library == 'seaborn':
                     sns.countplot(y=df[var], hue=df[hue], order=df[var].value_counts().index)
                 else:
-                    data = df.groupby(by=[var, hue])[var, hue].size().unstack(fill_value=0)
+                    data = df.groupby(by=[var, hue])[[var, hue]].size().unstack(fill_value=0)
                     data = data.sort_values(by=list(data.columns)[0])
 
                     y = np.arange(len(data.index))
@@ -523,7 +542,12 @@ class DataVisualizer:
             - The chart is created using either seaborn or matplotlib library, based on the selected library.
 
         """
-        std_df = df.corr()
+        # Exclude columns with non-numeric values
+        numeric_columns = df.select_dtypes(include=[np.number]).columns
+        df_numeric = df[numeric_columns]
+
+        # Calculate correlation matrix
+        std_df = df_numeric.corr()
         std_df = std_df.drop(columns=['Unnamed: 0'], index=['Unnamed: 0'])
         
         if self.library=='seaborn':
@@ -661,6 +685,10 @@ class DataVisualizer:
         plt.xlabel(x)
         plt.ylabel(y)
         plt.show()
+        if self.save:
+            plt.savefig('./database/output/graphs/Box_plot_average_rating_by_category_by_type_:_Free-Paid.png')
+        if self.show:
+            plt.show()
 
 
     def stacked_bar(self, df):

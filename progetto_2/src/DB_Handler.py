@@ -1,10 +1,12 @@
 import psycopg2
 import csv
 import pandas as pd
+import os
+
 
 class DB_Handler:
     """A class for handling database operations."""
-    def __init__(self, database, user, password, host, port):
+    def __init__(self, database, user, password, host, port, path:str):
         """
         Initialize the DB_Handler object.
 
@@ -20,6 +22,7 @@ class DB_Handler:
         self.password = password
         self.host = host
         self.port = port
+        self.path = path
     
 
     def open_connection(self):
@@ -77,8 +80,9 @@ class DB_Handler:
                 WHERE NOT EXISTS (
                     SELECT 1 FROM categories WHERE Name = %s
                 )
-            """
-            self.insert_values_categories('./database/output/processed_googleplaystore.csv', categories_insert_query)
+            """            
+
+            self.insert_values_categories(self.path, categories_insert_query)
             
             # Create apps table
             apps_table_query = """
@@ -97,7 +101,7 @@ class DB_Handler:
                     SELECT 1 FROM apps WHERE name = %s
                 )
             """
-            self.insert_values_apps('./database/output/processed_googleplaystore.csv', apps_insert_query)
+            self.insert_values_apps(self.path, apps_insert_query)
             
             # Create main table
             main_table_query = """
@@ -126,7 +130,7 @@ class DB_Handler:
                     "Content Rating", Genres, "Last Updated", "Age Restriction") 
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
-            self.insert_values_main('./database/output/processed_googleplaystore.csv', main_insert_query)
+            self.insert_values_main(self.path, main_insert_query)
 
             self.conn.commit()
             print("Data pipeline executed successfully")
@@ -217,7 +221,7 @@ class DB_Handler:
         try:
             with open(path, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
-                next(reader)  
+                next(reader)  # Skip header row
                 for row in reader:
                     Index, app_id, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction = row
                     app_id_query = """SELECT "App ID" FROM apps WHERE "name" = %s"""
@@ -225,7 +229,7 @@ class DB_Handler:
                     self.cur.execute(category_id_query, (category_id,))
                     category_id = self.cur.fetchone()[0]
                     self.cur.execute(app_id_query, (app_id,))
-                    app_id = self.cur.fetchone()[0]
+                    app_id = self.cur.fetchone()
                     app_values = (Index, app_id, category_id, rating, reviews, size, installs, app_type, price, content_rating, genres, last_updated, age_restriction)
                     self.cur.execute(query, app_values)
             self.conn.commit()

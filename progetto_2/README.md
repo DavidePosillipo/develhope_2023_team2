@@ -29,7 +29,10 @@ Follow these steps to get the project up and running on your local machine:
    bash
    git clone https://github.com/DavidePosillipo/develhope_2023_team2.git
 
-2. Install the required Python libraries:
+2. Go to project directory:
+
+   bash
+   
 
     bash
     Copy code

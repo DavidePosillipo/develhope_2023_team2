@@ -10,8 +10,8 @@ from datetime import datetime
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
-dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True)
+dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True, path='airflow/dags/database/output/graphs') 
+dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True, path='airflow/dags/database/output/graphs')
 da = DataAnalyzer()
 
 default_args = {
@@ -23,7 +23,9 @@ default_args = {
 with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
     
     def data_processor():
-
+        """
+        Task to process the data.
+        """
         df = di.load_file(path='airflow/dags/database/raw/googleplaystore.csv')
         df = dp.pipeline(df)
         di.save_file(df, 'airflow/dags/database/output/processed_googleplaystore.csv')
@@ -33,15 +35,20 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         di.save_file(df_reviews, 'airflow/dags/database/output/processed_reviews.csv')
 
     def data_analyzer():
-
+        """
+        Task to analyze the data.
+        """
         df = di.load_file(path='airflow/dags/database/output/processed_googleplaystore.csv')
         df_reviews = di.load_file('airflow/dags/database/output/processed_reviews.csv')
         negative_words = di.load_file('airflow/dags/database/raw/n.xlsx')
         positive_words = di.load_file('airflow/dags/database/raw/p.xlsx')
-        df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words= negative_words, p_words= positive_words)
+        df_reviews, df_sentiment, df_all = da.pipeline(df, df_reviews, n_words=negative_words, p_words=positive_words)
         di.save_file(df_all, 'airflow/dags/database/output/googleplaystore_sentiment.csv')
 
     def data_visualizer():
+        """
+        Task to visualize the data.
+        """
         df = di.load_file(path='airflow/dags/database/output/processed_googleplaystore.csv')
         df_all = di.load_file('airflow/dags/database/output/googleplaystore_sentiment.csv')
         dv_seaborn.pipeline(df, df_all)
@@ -50,7 +57,10 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         di.load_image('png', path='airflow/dags/database/output/graphs', library='matplotlib')
 
     def db_handler():
-        dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434)
+        """
+        Task to handle the database locally.
+        """
+        dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434, path='airflow/dags/database/output/processed_googleplaystore.csv')
         
         try:
             dh.open_connection()
@@ -64,7 +74,10 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
             dh.close_connection()
     
     def db_cloud():
-        dh_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432)
+        """
+        Task to handle the database in the cloud.
+        """
+        dh_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432, path='airflow/dags/database/output/processed_googleplaystore.csv')
         
         try:
             dh_cloud.open_connection()

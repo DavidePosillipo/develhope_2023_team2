@@ -8,10 +8,10 @@ from src.DB_Handler import DB_Handler
 
 di = DataIngestor()
 dp = DataPreprocessor()
-dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True) 
-dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True)
+dv_seaborn = DataVisualizer(library="seaborn", style='darkgrid', show=False, save=True, path='database/output/graphs/') 
+dv_matplotlib= DataVisualizer(library="matplotlib", style='darkgrid', show=False, save=True, path='database/output/graphs/')
 da = DataAnalyzer()
-db = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434)
+
 
 # Uploads csv file containing data about Google Play Store apps
 df = di.load_file('database/raw/googleplaystore.csv')
@@ -52,12 +52,12 @@ df_all = di.load_file('database/output/googleplaystore_sentiment.pkl')
 dv_seaborn.pipeline(df, df_all)
 dv_matplotlib.pipeline(df, df_all)
 # Loads PNG graphs based on library
-di.load_image('png', path = 'database/output/graphs/', library='seaborn')
-di.load_image('png', path = 'database/output/graphs/', library='matplotlib')
+#di.load_image('png', path = 'database/output/graphs/', library='seaborn')
+#di.load_image('png', path = 'database/output/graphs/', library='matplotlib')
 
 
 #In order to run the following part of the code you need to have installed postgres and have it running
-dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434)
+dh = DB_Handler(database='postgres', user='postgres', password='c', host='localhost', port=5434, path='database/output/processed_googleplaystore.csv')
 
 try:
     dh.open_connection()
@@ -77,7 +77,7 @@ finally:
 
 # In order to run the following part of the code you need to create a cloud account. 
 # You can create a free account on https://www.elephantsql.com/ and change the following parameters according to your account.
-dh_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432)
+dh_cloud = DB_Handler(database='yhpzbiwk', user='yhpzbiwk', password='gNxA8nZrA_vFYCAQ143gVn-HRg6XTF1-', host='snuffleupagus.db.elephantsql.com', port=5432, path='database/output/processed_googleplaystore.csv')
 
 try:
     dh_cloud.open_connection()

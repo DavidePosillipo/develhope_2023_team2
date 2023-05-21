@@ -53,8 +53,8 @@ with DAG("dag_progetto_Team_2", default_args=default_args) as dag:
         df_all = di.load_file('airflow/dags/database/output/googleplaystore_sentiment.csv')
         dv_seaborn.pipeline(df, df_all)
         dv_matplotlib.pipeline(df, df_all)
-        di.load_image('png', path='airflow/dags/database/output/graphs', library='seaborn')
-        di.load_image('png', path='airflow/dags/database/output/graphs', library='matplotlib')
+        #di.load_image('png', path='airflow/dags/database/output/graphs', library='seaborn')
+        #di.load_image('png', path='airflow/dags/database/output/graphs', library='matplotlib')
 
     def db_handler():
         """

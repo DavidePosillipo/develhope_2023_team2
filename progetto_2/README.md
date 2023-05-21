@@ -71,7 +71,8 @@ Follow these steps to get the project up and running on your local machine:
 
 8. Set up the Airflow connection:
 
-   Create a new connection in Airflow using the connection details used in point 6.
+   Create a new connection in Airflow using the connection details used at point 6.
    You might have to adjust some parameters according to your machine and airflow setup.
+   
    There are many ways to connect the repository to airflow, the simplest way is to paste the files from develhope_2023_team2/progetto_2 repository to your airflow/dags folder. In this way you can keep the same path variables as in prj_dag.py file.
    Otherwise you will have to update the path variables according to your setup.

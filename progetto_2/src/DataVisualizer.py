@@ -238,7 +238,7 @@ class DataVisualizer:
         """
         print(df[col1].values, "\n", np.asarray(df[col2].values, dtype=int))
         def rho(col1, col2):
-            r = np.corrcoef(col1, col2)   # np.array(col1), np.asarray(df[col2].values, dtype=int)
+            r = np.corrcoef(col1, col2)  
             return r[0,1]
 
         fig, ax = plt.subplots()

@@ -72,7 +72,6 @@ class DataVisualizer:
             self.correlation_heatmap(df)
             self.violin_plot(df, x='Category', y='Rating', hue='Type')
             self.box_plot(df,x='Category',y='Rating',hue='Type', avg_column='Rating')
-            self.stacked_bar(df)
             self.sent_category_hbar(df_all)
 
         elif self.library == 'matplotlib':
